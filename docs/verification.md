@@ -3,13 +3,14 @@
 Host: Windows x64. Python 3.14.7 through `py -3`, .NET SDK 8.0.204, Node 24.19.0 and Electron 44.5.1.
 
 - Strict TypeScript, ESLint and production desktop build: pass.
-- Vitest: **42 tests passed** (40 in the complete check, followed by two new localization/migration tests). Real C# checks cover all three lessons, top-level await, compiler/runtime source lines, Stop/recovery after an active infinite loop, output limits and missing SDK errors.
-- Playwright: **6 desktop scenarios passed against the final packaged Windows executable** (36.1 seconds). Includes native/menu UI language, persisted Spanish and C# selection, copying a lesson, opening its code in a new tab with Auto Run off, actual C# execution and restart persistence.
+- Vitest: **44 tests passed** in the final complete suite. Persistence regression tests simulate transient replacement locks and permanent errors, checking save ordering, preservation of the original file and subsequent recovery. Real C# checks cover all three lessons, top-level await, compiler/runtime source lines, Stop/recovery after an active infinite loop, output limits and missing SDK errors.
+- Playwright: **6 desktop scenarios passed against the final packaged Windows executable** (35.5 seconds). Includes native/menu UI language, persisted Spanish and C# selection, copying a lesson, opening its code in a new tab with Auto Run off, actual C# execution and restart persistence.
 - Documentation Playwright: **2 scenarios passed**, covering all 12 guides, search, clipboard, theme persistence, 13 learning examples and mobile navigation/overflow. Desktop and mobile screenshots inspected.
-- Documentation production build passes and includes MIT and third-party notices.
+- Documentation production build passes and includes MIT and third-party notices. GitHub Pages deployment succeeded; the public home page and C# guide were checked with Chromium (HTTP 200, expected headings, no client errors).
 - `pnpm install --frozen-lockfile --offline`: pass using the populated local cache. License generator records 587 dependency notices.
+- GitHub Actions [run 37130267135](https://github.com/METAWISER/open-scratch/actions/runs/37130267135) on revision `e041024`: typecheck, lint, 44 unit/integration tests, desktop E2E and folder packaging passed on Windows, Linux and macOS runners. Remote E2E exercised development builds; final packaged-executable E2E was performed locally on Windows. This does not verify signed installers, notarization or every OS/hardware version.
 - Windows application folder: `release/v0.3.0/win-unpacked/OpenScratch.exe`.
-- Unsigned Windows x64 NSIS installer: `release/v0.3.0/OpenScratch Setup 0.3.0.exe` (127851688 bytes). SHA256: `A06BC2EEEA77D978CFBCBB8439AC66E0018C307297713A9E31C9DA74D60587F0`.
+- Unsigned Windows x64 NSIS installer: `release/v0.3.0/OpenScratch Setup 0.3.0.exe` (127857023 bytes). SHA256: `C06340442CCE08EE09ED496D53C7A6E506F9B86D727B86498DC88103FCE2E8A4`.
 
 Python and C# require separately installed runtimes. Their editor support is basic syntax highlighting, without semantic language servers or integrated package managers. C# uses explicit console output rather than Auto Log. Monaco's built-in menus remain English; OpenScratch controls and native menus support English and Spanish. Compiler diagnostics and user output are preserved in their original language. Website documentation is English. No installer wizard, macOS/Linux application or signing check was performed locally, and no release was uploaded.
 
