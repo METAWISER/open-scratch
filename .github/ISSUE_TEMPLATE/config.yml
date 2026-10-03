@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Guía para contribuir
+  - name: Contributing guide
     url: https://github.com/METAWISER/open-scratch/blob/main/CONTRIBUTING.md
-    about: Código, documentación, ejemplos y pruebas mediante forks y pull requests.
-  - name: Política de seguridad
+    about: Contribute code, guides, examples, and tests through forks and pull requests.
+  - name: Security policy
     url: https://github.com/METAWISER/open-scratch/blob/main/SECURITY.md
-    about: No publiques vulnerabilidades explotables en issues.
+    about: Do not post exploitable vulnerabilities in public issues.

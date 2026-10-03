@@ -1,12 +1,12 @@
-# Código de conducta
+# Code of conduct
 
-OpenScratch acoge personas de cualquier origen y nivel de experiencia.
+OpenScratch welcomes people of every background and experience level.
 
-- Sé amable, concreto y constructivo al revisar ideas y código.
-- Acepta preguntas de principiantes y diferencias técnicas.
-- Respeta la privacidad y atribuye el trabajo ajeno.
-- No se permiten acoso, amenazas, discriminación, ataques personales, contenido sexual no solicitado ni publicación de información privada.
+- Be kind, specific, and constructive when reviewing ideas and code.
+- Welcome beginner questions and technical differences of opinion.
+- Respect privacy and credit other people's work.
+- Harassment, threats, discrimination, personal attacks, unsolicited sexual content, and disclosure of private information are not acceptable.
 
-Estas reglas se aplican a issues, PR y espacios oficiales. METAWISER puede retirar contenido, cerrar conversaciones o restringir participación de forma proporcional, explicando las decisiones cuando sea apropiado.
+These rules apply to issues, pull requests, and official project spaces. METAWISER may remove content, close discussions, or restrict participation proportionately, explaining decisions where appropriate.
 
-Usa «Report content» de GitHub para reportar abuso. No publiques información sensible en issues. Actualmente no hay un canal privado de moderación propio ni un plazo de respuesta garantizado.
+Use GitHub's Report content feature to report abuse. Do not post sensitive information in an issue. The project currently has no dedicated private moderation channel or guaranteed response time.

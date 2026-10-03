@@ -4,8 +4,8 @@ export interface AIMessage {
   content: string;
 }
 export interface AIContext {
-  language: "js" | "ts" | "jsx" | "tsx" | "py";
-  runtime: "node" | "browser" | "python";
+  language: "js" | "ts" | "jsx" | "tsx" | "py" | "cs";
+  runtime: "node" | "browser" | "python" | "dotnet";
   code: string;
   selectedOutput?: string;
 }

@@ -1,26 +1,26 @@
-name: Error reproducible
-description: Comunica un fallo con un ejemplo mínimo sin secretos.
+name: Bug report
+description: Report a reproducible problem without secrets.
 title: "[Bug] "
 body:
   - type: markdown
     attributes:
-      value: "Para vulnerabilidades consulta SECURITY.md. No publiques detalles sensibles."
+      value: "Read SECURITY.md for vulnerabilities. Do not post sensitive details."
   - type: input
     id: environment
     attributes:
-      label: Versión de OpenScratch y sistema operativo
-      placeholder: "0.2.0, Windows 11 x64, Python 3.12 si aplica"
+      label: OpenScratch version and operating system
+      placeholder: "0.3.0, Windows 11 x64, Python / .NET SDK version if relevant"
     validations:
       required: true
   - type: textarea
     id: reproduce
     attributes:
-      label: Pasos y snippet mínimo sin datos personales
+      label: Steps and minimal snippet without private data
     validations:
       required: true
   - type: textarea
     id: expected
     attributes:
-      label: Resultado esperado y observado
+      label: Expected and observed behavior
     validations:
       required: true

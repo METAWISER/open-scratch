@@ -1,15 +1,17 @@
-# Aprender y consultar
+# Learn and reference
 
-**Aprender** abre fichas locales en español. **Consultar** busca la palabra bajo el cursor; la paleta ofrece la misma acción. Busca por nombre o intención (`sumar`, `recorrer`, `reduce`). Filtra por lenguaje o Todos. TypeScript incluye fichas JavaScript.
+Open **Learn** for offline practical guides. **Look up** searches the word under the cursor; the command palette offers the same action. Search by method name or intent, such as `sum`, `iterate`, or `reduce`. Filter by language or choose All. TypeScript includes JavaScript cards.
 
-Las explicaciones y ejemplos son originales. MDN es una referencia comunitaria de JavaScript, no la especificación oficial ECMAScript. TypeScript y Python enlazan documentación oficial. Las fichas funcionan offline; abrir referencias requiere conexión y una acción explícita. El IPC solo admite IDs de enlaces del catálogo, no URLs arbitrarias.
+Click an example's **title**, **code block**, or **Open example in a new tab** button. OpenScratch preserves your existing tabs, creates a new tab in the correct language and runtime, and disables Auto Run. Press Run when you are ready. This is the primary action because it avoids replacing work or silently changing your clipboard. A separate **Copy** action is also available.
 
-**Abrir ejemplo en una pestaña** conserva tu código y desactiva Auto Run. Pulsa Run para probarlo. Copiar copia solo el ejemplo.
+The initial catalog contains thirteen original examples for JS/TS, Python, and C#. Explanations follow the app's English/Spanish interface setting; identifiers and example code are shared between both languages. Search recognizes keywords in both languages.
 
-La consulta contextual es léxica, no identifica tipos ni métodos de bibliotecas. Comprueba que la ficha corresponde a tu caso. Hay diez fichas iniciales, no documentación completa. No usa IA ni descarga contenido silenciosamente.
+The guides work offline. **View reference** explicitly opens your default browser and may require Internet. MDN is a community reference for JavaScript, not the official ECMAScript specification. TypeScript, Python, and C# link to their official documentation. Only known catalog IDs can be opened through the application bridge; arbitrary URLs are rejected.
 
-## Añadir fichas
+Contextual lookup is lexical, not semantic. Check that a card refers to the same method or library as your code. The catalog is a starting point, not a complete language manual. It uses no AI and does not fetch content in the background.
 
-Edita `src/learning/catalog.ts`: id único, lenguaje, título, explicación, palabras clave, código original, consejo, URL HTTPS y atribución. Evita copiar tutoriales. Indica versiones y comprueba ejemplos en su motor. Los tests recorren ejemplos Python y JS/TS; mantenlos deterministas y sin paquetes, red ni archivos del usuario.
+## Contributing a guide
 
-Referencias: [AST Python](https://docs.python.org/3/library/ast.html), [control de flujo](https://docs.python.org/3/tutorial/controlflow.html), [estructuras de datos](https://docs.python.org/3/tutorial/datastructures.html), [MDN reduce](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce), [MDN forEach](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach).
+Add a Lesson to `src/learning/catalog.ts`: unique ID, language, English title/summary/tip/source, Spanish equivalents, bilingual keywords, original executable code, a version indication, and an HTTPS reference. Keep examples deterministic and independent of packages, network access, and user files. Integration tests execute every catalog example in its actual engine.
+
+Sources include [Python AST](https://docs.python.org/3/library/ast.html), [MDN reduce](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/reduce), [MDN forEach](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach), and [Microsoft C# documentation](https://learn.microsoft.com/en-us/dotnet/csharp/).

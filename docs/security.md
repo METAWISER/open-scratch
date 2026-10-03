@@ -18,3 +18,9 @@ Both runtimes also enforce fixed transport ceilings (180 KB per snapshot and 4 M
 ## Python and reference links (0.2)
 
 Python snippets have full user permissions just like Node. The interpreter is user-installed and may be a chosen virtualenv executable. The app launches it with structured arguments, a restricted inherited environment, explicit tab overrides and no shell. Timeout and output protections apply; the Node memory setting does not limit Python. No Python heap cap or hostile-code sandbox is provided. Deliberately detached children remain outside the process-tree cleanup guarantee. Reference links are catalog IDs resolved in main, never arbitrary renderer URLs; opening them is explicit and code is not sent.
+
+## C# and .NET (0.3)
+
+C# uses a temporary SDK project with cleared NuGet sources and disabled shared build servers. Compilation and execution run in separate cancellable processes with a basic environment allowlist, required OS directory variables, and explicit tab overrides. .NET CLI telemetry is disabled. SDK framework reference packs must be installed for offline compilation. User C# code has user permissions and can still access the network; there is no C# memory cap or hostile-code sandbox. Output is bounded text and compiler/runtime source lines are parsed from diagnostics.
+
+The documentation website contains only public guides and original examples. It never receives desktop snippets or environment variables. Its Markdown comes from reviewed repository files, raw HTML is escaped, and search input is never evaluated as HTML. Clipboard writes happen only after a click.

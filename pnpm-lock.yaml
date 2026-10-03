@@ -54,6 +54,9 @@ importers:
       eslint:
         specifier: ^10.11.0
         version: 10.11.0(jiti@2.7.0)(supports-color@7.2.0)
+      marked:
+        specifier: 18.0.14
+        version: 18.0.14
       monaco-editor:
         specifier: ^0.55.1
         version: 0.55.1
@@ -1676,6 +1679,11 @@ packages:
   marked@14.0.0:
     resolution: {integrity: sha512-uIj4+faQ+MgHgwUW1l2PsPglZLOLOT1uErt06dAPtx2kjteLAkbsd/0FiYg/MGS+i7ZKLb7w2WClxHkzOOuryQ==}
     engines: {node: '>= 18'}
+    hasBin: true
+
+  marked@18.0.14:
+    resolution: {integrity: sha512-mBHK6FBHuBAlhgRe88w9F0O1AbwwXJUcQibUbC/QcdTbVGAD7aWza+xt3N6oT/jCZx3/OMeS+8rnuiHZcQ9s7A==}
+    engines: {node: '>= 20'}
     hasBin: true
 
   matcher@3.0.0:
@@ -4062,6 +4070,8 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.6.0
 
   marked@14.0.0: {}
+
+  marked@18.0.14: {}
 
   matcher@3.0.0:
     dependencies:

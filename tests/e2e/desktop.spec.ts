@@ -226,14 +226,14 @@ test("offline learning opens safe example tabs and Python executes and stops", a
   await page.getByLabel("Language", { exact: true }).selectOption("ts");
   await code("const preserved = 123; preserved");
   await page.getByLabel("Auto Run", { exact: true }).check();
-  await page.getByRole("button", { name: "Aprender", exact: true }).click();
-  await page.getByLabel("Buscar documentación").fill("sumar");
+  await page.getByRole("button", { name: "Learn", exact: true }).click();
+  await page.getByLabel("Search documentation").fill("sumar");
   await expect(
     page.getByRole("heading", { name: "Array.reduce()", exact: true }),
   ).toBeVisible();
   await page.screenshot({ path: "test-results/learning.png" });
   await page
-    .getByRole("button", { name: "Abrir ejemplo en una pestaña", exact: true })
+    .getByRole("button", { name: "Open example in a new tab", exact: true })
     .click();
   await expect(page.getByLabel("Auto Run", { exact: true })).not.toBeChecked();
   expect(
@@ -284,4 +284,71 @@ test("offline learning opens safe example tabs and Python executes and stops", a
       window.openscratch.openReference("https://example.invalid"),
     ),
   ).rejects.toThrow("Unknown reference");
+});
+
+test("English and Spanish persist and C# examples open in a safe new tab", async () => {
+  await page.getByRole("button", { name: "Preferences", exact: true }).click();
+  await page
+    .getByLabel("Interface language", { exact: true })
+    .selectOption("es");
+  await expect(
+    page.getByRole("heading", { name: "Preferencias", exact: true }),
+  ).toBeVisible();
+  expect(
+    await app.evaluate(({ Menu }) =>
+      Menu.getApplicationMenu()?.items.map((item) => item.label),
+    ),
+  ).toContain("Editar");
+  await page.getByRole("button", { name: "✕", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "▶ Ejecutar", exact: true }),
+  ).toBeVisible();
+  await page.getByLabel("Lenguaje", { exact: true }).selectOption("cs");
+  await expect(page.getByLabel("Motor", { exact: true })).toHaveValue("dotnet");
+  await page.getByRole("button", { name: "Aprender", exact: true }).click();
+  await page.getByLabel("Buscar documentación").fill("LINQ");
+  await expect(
+    page.getByRole("heading", {
+      name: "LINQ: Where, Select y Sum",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Copiar", exact: true }).click();
+  await expect
+    .poll(() => app.evaluate(({ clipboard }) => clipboard.readText()))
+    .toContain("Console.WriteLine(total)");
+  await page
+    .getByRole("button", {
+      name: "Abrir ejemplo en una pestaña: LINQ: Where, Select y Sum",
+      exact: true,
+    })
+    .click();
+  await expect(
+    page.getByLabel("Ejecución automática", { exact: true }),
+  ).not.toBeChecked();
+  await expect(
+    page.getByLabel("Registro automático", { exact: true }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "▶ Ejecutar", exact: true }).click();
+  await expect(page.getByTestId("output")).toContainText("12", {
+    timeout: 45000,
+  });
+  await expect(page.locator("footer")).toContainText("Listo");
+  await page.screenshot({ path: "test-results/spanish-csharp.png" });
+  await app.close();
+  app = await electron.launch({
+    executablePath: process.env.OPENSCRATCH_TEST_EXECUTABLE,
+    args: process.env.OPENSCRATCH_TEST_EXECUTABLE ? [] : ["."],
+    env: { ...process.env, OPENSCRATCH_DATA: directory },
+  });
+  page = await app.firstWindow();
+  await expect(page.getByLabel("Lenguaje", { exact: true })).toHaveValue("cs");
+  await page.getByRole("button", { name: "Preferencias", exact: true }).click();
+  await page
+    .getByLabel("Idioma de la interfaz", { exact: true })
+    .selectOption("en");
+  await page.getByRole("button", { name: "✕", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "▶ Run", exact: true }),
+  ).toBeVisible();
 });

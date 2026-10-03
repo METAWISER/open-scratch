@@ -1,23 +1,23 @@
-name: Propuesta o mejora
-description: Propón una función, lenguaje, ficha práctica o mejora de accesibilidad.
+name: Feature or improvement
+description: Suggest a feature, language, learning guide, or accessibility improvement.
 title: "[Idea] "
 body:
   - type: textarea
     id: problem
     attributes:
-      label: Qué problema quieres resolver
+      label: What problem would this solve?
     validations:
       required: true
   - type: textarea
     id: proposal
     attributes:
-      label: Propuesta y alternativas
-      description: Para fichas, añade una referencia fiable. Para lenguajes, indica tus necesidades de editor y ejecución.
+      label: Proposal and alternatives
+      description: Include reliable references for guides and editor/runtime needs for languages.
     validations:
       required: true
   - type: checkboxes
     id: contribution
     attributes:
-      label: Participación opcional
+      label: Optional participation
       options:
-        - label: Me gustaría colaborar en esta mejora
+        - label: I would like to help implement this

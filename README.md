@@ -1,10 +1,10 @@
 # OpenScratch
 
-A free, local desktop playground for JavaScript, TypeScript, JSX, TSX and Python. Original MIT implementation inspired by the interaction patterns documented by RunJS. No account, telemetry, subscription, cloud service or execution quotas. TypeScript is included.
+A free, local desktop playground for JavaScript, TypeScript, JSX, TSX, Python and C#. Original MIT implementation inspired by the interaction patterns documented by RunJS. No account, telemetry, subscription, cloud service or execution quotas. TypeScript is included.
 
 ## Develop and run
 
-Prerequisites: Node **24 LTS**, pnpm **11.19.0**, a desktop graphical session, and Python 3.10+ for Python execution/tests. The dependency lockfile is committed. Initial dependency/Electron downloads and registry operations need Internet; the installed app and already installed packages work offline.
+Prerequisites: Node **24 LTS**, pnpm **11.19.0**, a desktop graphical session, Python 3.10+ for Python execution/tests, and .NET SDK 8+ for C# execution/tests. The dependency lockfile is committed. Initial dependency/Electron downloads and registry operations need Internet; the installed app and already installed packages work offline.
 
 ```sh
 pnpm install --frozen-lockfile
@@ -18,7 +18,7 @@ pnpm check          # strict TypeScript, ESLint, Vitest, production build
 pnpm test:e2e       # build and launch real Electron with Playwright
 pnpm build
 pnpm start         # run the production build
-pnpm licenses      # regenerate full third-party notices
+pnpm run licenses      # regenerate full third-party notices
 pnpm package:dir   # unpacked desktop application
 pnpm package       # installer for the host OS
 ```
@@ -31,7 +31,7 @@ Write code on the left and inspect snapshots on the right. Auto Log captures top
 
 Run: **Ctrl/Cmd R**. Stop: **Ctrl/Cmd Shift R**. Format: **Ctrl/Cmd Shift F**. Save snippet: **Ctrl/Cmd S**. Command palette: **Ctrl/Cmd Shift P**. Monaco includes search with Ctrl/Cmd F, hover, suggestions and inline diagnostics. Toggle logpoints using the gutter or F9; clear with Ctrl/Cmd Shift F9. Logpoints are session-only. Drag the separator or focus it and use arrow keys to resize panels.
 
-Select language and runtime in the status bar. Set cwd, explicit runtime environment variables and a tab name in Tab settings. Import/export JS/TS/JSX/TSX/PY there. Duplicate tabs and save independent snippet snapshots; search/open/delete saved snippets in the library. Workspace tabs, snippets and preferences autosave. Environment values are encrypted with OS secure storage when available; without it, they are session-only.
+Select language and runtime in the status bar. Set cwd, explicit runtime environment variables and a tab name in Tab settings. Import/export JS/TS/JSX/TSX/PY/CS there. Duplicate tabs and save independent snippet snapshots; search/open/delete saved snippets in the library. Workspace tabs, snippets and preferences autosave. Environment values are encrypted with OS secure storage when available; without it, they are session-only.
 
 Auto Run has a configurable debounce and supersedes the previous process. Stop terminates the execution context, including infinite loops. Settings include theme, font, wrapping, format preferences, output limits and lifetime. Set lifetime to 0 for persistent preview/server work and stop it manually. Node scripts have user permissions: read [security notes](docs/security.md).
 
@@ -48,11 +48,15 @@ basename('/hello/world');
 
 Static ESM imports and CommonJS require resolve installed packages in the separate dependency workspace. Relative static imports are bundled from tab cwd; require resolves cwd first, then the dependency workspace. Native Node modules work. ESM-only packages should be imported; `require` follows the embedded Node version's native behavior. Dynamic nonliteral relative ESM imports and import.meta.url reflect the generated module path, not a virtual file in cwd. See parity limitations.
 
-### Python and practical documentation
+### Python, C# and practical documentation
 
 Select **PY** in Language. Install Python 3.10+ separately; OpenScratch uses `py -3` on Windows and `python3` elsewhere. In Tab settings you can select an interpreter or virtualenv executable. Python runs in a dedicated cancellable process with AST Auto Log, top-level await, bounded collection inspection and original error lines. Python has syntax highlighting but no language server, formatter or integrated pip manager yet. See [language support and limits](docs/languages.md).
 
-Open **Aprender** for ten offline Spanish reference cards with original runnable examples (reduce, forEach, map, filter, find, generics, Python loops, sum, comprehensions and dictionaries). **Consultar** searches the word under the cursor. Search by intent, copy an example or open it in a new tab; opening an example disables Auto Run. References open explicitly in your browser. See [learning guide](docs/learning.md).
+Open **Learn** for thirteen offline English/Spanish reference cards with original runnable examples (reduce, forEach, map, filter, find, generics, Python loops, sum, comprehensions, dictionaries, and C# foreach/LINQ/await). **Look up** searches the word under the cursor. Search by intent, copy an example or open it in a new tab; opening an example disables Auto Run. References open explicitly in your browser. See [learning guide](docs/learning.md).
+
+Choose **C#** to compile and run top-level C# code with an installed .NET SDK 8+. Set an explicit dotnet executable in Tab settings if needed. Use `Console.WriteLine` for output; C# Auto Log, semantic completion, formatting, and NuGet management are not implemented. Build and execution are cancellable and normal standard-library snippets compile offline.
+
+Choose **Preferences → Interface language** for English or Spanish. The preference persists and updates application controls, native menus, and learning explanations. User code, compiler output, package logs, and Monaco's internal editor commands keep their own language.
 
 ### Packages and Browser
 
@@ -77,7 +81,7 @@ Documented RunJS syntax implemented here: trailing `//?`, inline `/*?*/`, and a 
 - `src/renderer`: React UI, Monaco, editor state, snapshot inspector. No Node privileges.
 - `src/main`: Electron composition, validated IPC, encrypted persistence, npm workspace, isolated preview.
 - `src/compiler`: TypeScript AST selection, MagicString mapping and esbuild transpilation/bundling.
-- `src/runtime`: disposable Node/Python processes, Browser capture, bounded serialization.
+- `src/runtime`: disposable Node/Python/.NET processes, Browser capture, bounded serialization.
 - `src/shared`: versioned state schema and bridge/event contracts.
 - `src/ai`: optional provider/transport/credentials contracts and explicit context construction, streaming/cancellation and proposal acceptance. No chat or network provider is active. See [AI integration](docs/ai-provider.md).
 
@@ -92,3 +96,15 @@ Original code: [MIT](LICENSE). Retain [third-party notices](THIRD_PARTY_NOTICES.
 ## Community
 
 [GitHub repository](https://github.com/METAWISER/open-scratch) · [Report a bug or propose a feature](https://github.com/METAWISER/open-scratch/issues/new/choose). Contributions use forks and pull requests; no invitation is needed. Start with [CONTRIBUTING.md](CONTRIBUTING.md). Issue/PR templates, a code of conduct, security policy and cross-platform CI are included.
+
+## Documentation website
+
+The English documentation site lives in `website/` and renders the same Markdown guides maintained under `docs/`. It includes navigation, page search, light/dark themes, mobile navigation, code copying, and links to improve each guide.
+
+```sh
+pnpm docs:dev       # http://127.0.0.1:4174
+pnpm docs:build     # static output in dist-docs/
+pnpm test:docs      # browser checks against a local documentation server
+```
+
+The Pages workflow publishes documentation on changes to main; desktop installers are never uploaded by it. See [website maintenance](docs/website.md).

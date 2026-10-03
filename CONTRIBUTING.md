@@ -1,35 +1,35 @@
-# Contribuir a OpenScratch
+# Contributing to OpenScratch
 
-Puedes contribuir con código, pruebas, documentación, traducciones, accesibilidad, ejemplos o informes de errores. No necesitas acceso de escritura: usa un fork y un pull request.
+You can contribute code, tests, documentation, translations, accessibility improvements, examples, and bug reports. You do not need write access: use a fork and a pull request.
 
-## Primeros pasos
+## Getting started
 
-1. Busca un [issue existente](https://github.com/METAWISER/open-scratch/issues) o abre uno con las plantillas. Para cambios grandes, describe primero el problema y el alcance.
-2. Haz un fork de [METAWISER/open-scratch](https://github.com/METAWISER/open-scratch) y clónalo.
-3. Instala Node 24, pnpm 11.19 y Python 3.10+ (necesario para las pruebas de Python). Ejecuta `pnpm install --frozen-lockfile`.
-4. Crea una rama: `git switch -c feat/mi-mejora`. Ejecuta `pnpm dev` y añade pruebas del comportamiento.
-5. Ejecuta `pnpm check` y `pnpm test:e2e`. Electron necesita sesión gráfica; Linux CI utiliza Xvfb.
-6. Sube la rama a tu fork y abre un pull request contra `main`, explicando qué cambia y cómo lo verificaste. No necesitas invitación como colaborador.
+1. Search [existing issues](https://github.com/METAWISER/open-scratch/issues) or open one using the templates. Discuss large changes before implementing them.
+2. Fork [METAWISER/open-scratch](https://github.com/METAWISER/open-scratch) and clone your fork.
+3. Install Node 24, pnpm 11.19, Python 3.10+, and .NET SDK 8+. Python and .NET are required for the corresponding integration tests.
+4. Run `pnpm install --frozen-lockfile`, create a branch with `git switch -c feat/my-improvement`, and start `pnpm dev`.
+5. Add meaningful tests and run `pnpm check`, `pnpm test:e2e`, `pnpm docs:build`, and `pnpm test:docs`. Electron needs a graphical session; Linux CI uses Xvfb.
+6. Push your branch to your fork and open a pull request against `main`. Explain the behavior change, validation, and limitations. No collaborator invitation is required.
 
-## Primeras contribuciones
+## Good first contributions
 
-- Añadir una ficha original a `src/learning/catalog.ts`, con ejemplo comprobado, versión y referencia. Consulta [el formato](docs/learning.md).
-- Mejorar textos, accesibilidad o navegación por teclado.
-- Reproducir un error con un snippet mínimo sin datos privados.
-- Añadir pruebas o mejorar las instrucciones para tu sistema operativo.
+- Add an original learning card to `src/learning/catalog.ts`, with a tested example, English and Spanish text, keywords, version information, and a reference. See [learning](docs/learning.md).
+- Improve keyboard navigation, accessibility, or a translation in `src/shared/i18n.ts`.
+- Reproduce a bug with a small snippet that contains no private data.
+- Improve documentation or platform-specific setup instructions.
 
-## Reglas técnicas
+## Technical guidelines
 
-Mantén separados interfaz, IPC, compilación, runtimes, paquetes e IA. Valida emisor y contenido de cada IPC. Nunca ejecutes snippets en main ni en el renderer de la interfaz. Los motores nuevos siguen `ExecutionEngine`: consulta [multilenguaje](docs/languages.md).
+Keep UI, IPC, compilation, runtimes, package management, and AI separate. Validate IPC senders and payloads. Never execute snippets in Electron main or the application renderer. New engines follow `ExecutionEngine`; see [language support](docs/languages.md).
 
-Para instrumentación, prueba efectos secundarios, evaluación única, líneas originales, asincronía y cancelación. Actualiza `docs/parity.md` y marca limitaciones reales.
+Test evaluation order, single evaluation, original lines, asynchronous behavior, cancellation, and output limits when changing instrumentation. Update `docs/parity.md` and state real limitations.
 
-Sin telemetría, servicios cloud obligatorios, cuotas ni código enviado automáticamente. Scripts de instalación de paquetes desactivados por defecto. No introduzcas secretos en ejemplos o fixtures.
+No telemetry, mandatory cloud services, commercial quotas, or automatic code transmission. Package installation scripts remain disabled by default. Do not add secrets to examples, fixtures, or logs.
 
-Las contribuciones se distribuyen bajo MIT. Escribe ejemplos propios y mantén avisos de terceros. Ejecuta `pnpm licenses` cuando cambies dependencias. No se requiere CLA; al contribuir aceptas distribuir tu aportación bajo MIT.
+Original code and contributions are distributed under MIT. Write your own examples rather than copying tutorials. Keep third-party notices and run `pnpm run licenses` when dependencies change. No CLA is required; submitting a contribution means you agree to distribute it under MIT.
 
-## Revisión y comunidad
+## Review and community
 
-METAWISER mantiene el proyecto y decide las integraciones. Los PR deben ser acotados, superar CI y recibir revisión antes de integrarse. No hay publicación automática de releases. Consulta [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) y [SECURITY.md](SECURITY.md).
+METAWISER currently maintains the project and makes integration decisions. Keep PRs focused, pass CI, and obtain review before merging. Releases are not published automatically. Read [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) and [SECURITY.md](SECURITY.md).
 
-Las plantillas facilitan participar; no conceden permisos de escritura ni garantizan tiempos de respuesta. Un servidor de lenguaje Python, pip y otros motores se discutirán por separado.
+Templates do not grant write permission or guarantee response times. Discuss additional runtimes, language servers, and package managers in an issue before starting a large implementation.

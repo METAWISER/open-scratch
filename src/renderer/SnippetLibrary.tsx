@@ -1,3 +1,4 @@
+import { useTranslation } from "./i18n";
 import { useState } from "react";
 import type { Tab } from "../shared/contracts";
 export function SnippetLibrary({
@@ -9,19 +10,21 @@ export function SnippetLibrary({
   onOpen: (tab: Tab) => void;
   onChange: (snippets: Tab[]) => void;
 }) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   return (
     <>
       <input
         autoFocus
-        aria-label="Search snippets"
-        placeholder="Search snippets…"
+        aria-label={t("Search snippets")}
+        placeholder={t("Search snippets…")}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
       <p className="muted">
-        Ctrl / ⌘ S saves a snapshot. Rename here, or open a copy to edit its
-        code.
+        {t(
+          "Ctrl / ⌘ S saves a snapshot. Rename here, or open a copy to edit its code.",
+        )}
       </p>
       {snippets
         .filter((t) =>
@@ -30,7 +33,7 @@ export function SnippetLibrary({
         .map((tab) => (
           <div className="list-row snippet-row" key={tab.id}>
             <input
-              aria-label={`Rename ${tab.name}`}
+              aria-label={`${t("Rename")} ${tab.name}`}
               value={tab.name}
               onChange={(e) =>
                 onChange(
@@ -41,21 +44,25 @@ export function SnippetLibrary({
               }
             />
             <span className="muted">{tab.language.toUpperCase()}</span>
-            <button onClick={() => onOpen(tab)}>Open</button>
+            <button onClick={() => onOpen(tab)}>{t("Open")}</button>
             <button
               onClick={() =>
                 onChange([
                   ...snippets,
-                  { ...tab, id: crypto.randomUUID(), name: `${tab.name} copy` },
+                  {
+                    ...tab,
+                    id: crypto.randomUUID(),
+                    name: `${tab.name} ${t("copy")}`,
+                  },
                 ])
               }
             >
-              Duplicate
+              {t("Duplicate")}
             </button>
             <button
               onClick={() => onChange(snippets.filter((t) => t.id !== tab.id))}
             >
-              Delete
+              {t("Delete")}
             </button>
           </div>
         ))}

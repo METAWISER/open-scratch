@@ -54,7 +54,9 @@ afterAll(async () => {
 });
 describe.sequential("real Node process", () => {
   it("executes all JavaScript and TypeScript learning examples", async () => {
-    for (const lesson of lessons.filter((x) => x.language !== "py")) {
+    for (const lesson of lessons.filter((x) =>
+      ["js", "ts"].includes(x.language),
+    )) {
       events = [];
       const r = request(lesson.code);
       r.tab.language = lesson.language;

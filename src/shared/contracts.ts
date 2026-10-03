@@ -1,5 +1,5 @@
 import { z } from "zod";
-export const languageSchema = z.enum(["js", "ts", "jsx", "tsx", "py"]);
+export const languageSchema = z.enum(["js", "ts", "jsx", "tsx", "py", "cs"]);
 export const limitsSchema = z.object({
   depth: z.number().int().min(1).max(12),
   entries: z.number().int().min(10).max(1000),
@@ -12,7 +12,8 @@ export const tabSchema = z.object({
   name: z.string().max(200),
   code: z.string().max(2_000_000),
   language: languageSchema,
-  runtime: z.enum(["node", "browser", "python"]),
+  runtime: z.enum(["node", "browser", "python", "dotnet"]),
+  dotnetExecutable: z.string().max(4096).default(""),
   pythonExecutable: z.string().max(4096).default(""),
   cwd: z.string().max(4096),
   env: z.record(
@@ -22,6 +23,7 @@ export const tabSchema = z.object({
   logpoints: z.array(z.number().int().positive()).max(1000),
 });
 export const settingsSchema = z.object({
+  locale: z.enum(["en", "es"]).default("en"),
   theme: z.enum(["dark", "light"]),
   autoRun: z.boolean(),
   autoLog: z.boolean(),
@@ -112,6 +114,7 @@ export interface Bridge {
   }): Promise<void>;
 }
 export const defaultSettings: Settings = {
+  locale: "en",
   theme: "dark",
   autoRun: false,
   autoLog: true,
@@ -131,6 +134,7 @@ export function newTab(id: string, name = "Untitled"): Tab {
     language: "ts",
     runtime: "node",
     pythonExecutable: "",
+    dotnetExecutable: "",
     cwd: "",
     env: {},
     logpoints: [],

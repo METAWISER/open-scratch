@@ -1,3 +1,19 @@
+# Verification record — 2026-10-03 / OpenScratch 0.3
+
+Host: Windows x64. Python 3.14.7 through `py -3`, .NET SDK 8.0.204, Node 24.19.0 and Electron 44.5.1.
+
+- Strict TypeScript, ESLint and production desktop build: pass.
+- Vitest: **42 tests passed** (40 in the complete check, followed by two new localization/migration tests). Real C# checks cover all three lessons, top-level await, compiler/runtime source lines, Stop/recovery after an active infinite loop, output limits and missing SDK errors.
+- Playwright: **6 desktop scenarios passed against the final packaged Windows executable** (36.1 seconds). Includes native/menu UI language, persisted Spanish and C# selection, copying a lesson, opening its code in a new tab with Auto Run off, actual C# execution and restart persistence.
+- Documentation Playwright: **2 scenarios passed**, covering all 12 guides, search, clipboard, theme persistence, 13 learning examples and mobile navigation/overflow. Desktop and mobile screenshots inspected.
+- Documentation production build passes and includes MIT and third-party notices.
+- `pnpm install --frozen-lockfile --offline`: pass using the populated local cache. License generator records 587 dependency notices.
+- Windows application folder: `release/v0.3.0/win-unpacked/OpenScratch.exe`.
+
+Python and C# require separately installed runtimes. Their editor support is basic syntax highlighting, without semantic language servers or integrated package managers. C# uses explicit console output rather than Auto Log. Monaco's built-in menus remain English; OpenScratch controls and native menus support English and Spanish. Compiler diagnostics and user output are preserved in their original language. Website documentation is English. No installer wizard, macOS/Linux application or signing check was performed locally, and no release was uploaded.
+
+---
+
 # Verification record — 2026-10-03 / OpenScratch 0.2
 
 Host: Windows x64. Python tested through `py -3`: 3.14.7. Same Node/Electron toolchain as the 0.1 record below.
@@ -45,7 +61,7 @@ Packaged testing drove fixes for native esbuild paths inside ASAR and npm's nest
 pnpm install --frozen-lockfile
 pnpm check
 pnpm test:e2e
-pnpm licenses
+pnpm run licenses
 pnpm package:dir
 ```
 

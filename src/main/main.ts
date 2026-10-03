@@ -14,6 +14,7 @@ import { format } from "prettier";
 import { z } from "zod";
 import { StateStore } from "./store";
 import { Packages } from "./packages";
+import { CSharpRunner } from "../runtime/csharp-runner";
 import { PythonRunner } from "../runtime/python-runner";
 import type { ExecutionEngine } from "../runtime/engine";
 import { referenceFor } from "../learning/catalog";
@@ -26,6 +27,7 @@ import {
   languageSchema,
   type RunEvent,
 } from "../shared/contracts";
+import { translate, type Locale } from "../shared/i18n";
 import { validEvent } from "../shared/wire";
 if (process.env.OPENSCRATCH_DATA)
   app.setPath("userData", process.env.OPENSCRATCH_DATA);
@@ -67,33 +69,43 @@ app
         sandbox: true,
       },
     });
-    Menu.setApplicationMenu(
-      Menu.buildFromTemplate([
-        { label: "OpenScratch", submenu: [{ role: "quit" }] },
-        {
-          label: "Edit",
-          submenu: [
-            { role: "undo" },
-            { role: "redo" },
-            { type: "separator" },
-            { role: "cut" },
-            { role: "copy" },
-            { role: "paste" },
-            { role: "selectAll" },
-          ],
-        },
-        {
-          label: "View",
-          submenu: [
-            { role: "reload" },
-            { role: "toggleDevTools" },
-            { role: "resetZoom" },
-            { role: "zoomIn" },
-            { role: "zoomOut" },
-          ],
-        },
-      ]),
-    );
+    let menuLocale: Locale | undefined;
+    const updateMenu = (locale: Locale) => {
+      if (menuLocale === locale) return;
+      menuLocale = locale;
+      const t = (text: string) => translate(locale, text);
+      Menu.setApplicationMenu(
+        Menu.buildFromTemplate([
+          {
+            label: "OpenScratch",
+            submenu: [{ role: "quit", label: t("Quit") }],
+          },
+          {
+            label: t("Edit"),
+            submenu: [
+              { role: "undo", label: t("Undo") },
+              { role: "redo", label: t("Redo") },
+              { type: "separator" },
+              { role: "cut", label: t("Cut") },
+              { role: "copy", label: t("Copy") },
+              { role: "paste", label: t("Paste") },
+              { role: "selectAll", label: t("Select all") },
+            ],
+          },
+          {
+            label: t("View"),
+            submenu: [
+              { role: "reload", label: t("Reload") },
+              { role: "toggleDevTools", label: t("Developer tools") },
+              { role: "resetZoom", label: t("Actual size") },
+              { role: "zoomIn", label: t("Zoom in") },
+              { role: "zoomOut", label: t("Zoom out") },
+            ],
+          },
+        ]),
+      );
+    };
+    updateMenu("en");
     window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
     window.webContents.on("will-navigate", (e) => e.preventDefault());
     const emit = (event: RunEvent) => {
@@ -114,10 +126,15 @@ app
     const node = new NodeRunner(workspace, join(__dirname, "worker.cjs"), emit);
     const browser = new BrowserRunner(window, workspace, __dirname, emit);
     const python = new PythonRunner(workspace, emit);
-    const engines: Record<"node" | "browser" | "python", ExecutionEngine> = {
+    const dotnet = new CSharpRunner(workspace, emit);
+    const engines: Record<
+      "node" | "browser" | "python" | "dotnet",
+      ExecutionEngine
+    > = {
       node,
       browser,
       python,
+      dotnet,
     };
     let requestGeneration = 0;
     const handle = (name: string, listener: (...args: unknown[]) => unknown) =>
@@ -134,31 +151,42 @@ app
       if (!url) throw new Error("Unknown reference");
       return shell.openExternal(url);
     });
-    handle("state:load", () => store.load());
-    handle("state:save", (state) => store.save(stateSchema.parse(state)));
+    handle("state:load", async () => {
+      const state = await store.load();
+      updateMenu(state.settings.locale);
+      return state;
+    });
+    handle("state:save", (payload) => {
+      const state = stateSchema.parse(payload);
+      updateMenu(state.settings.locale);
+      return store.save(state);
+    });
     handle("run", async (payload) => {
       const request = runSchema.parse(payload);
       const generation = ++requestGeneration;
       browser.stop();
-      await Promise.all([node.stop(), python.stop()]);
+      await Promise.all([node.stop(), python.stop(), dotnet.stop()]);
       if (generation !== requestGeneration) return;
       if (
         (request.tab.language === "py") !==
-        (request.tab.runtime === "python")
+          (request.tab.runtime === "python") ||
+        (request.tab.language === "cs") !== (request.tab.runtime === "dotnet")
       )
         throw new Error(
-          "Python requires the Python runtime; JavaScript/TypeScript require Node or Browser.",
+          "Choose the runtime matching the language: Python, .NET for C#, or Node/Browser for JS/TS.",
         );
       await engines[request.tab.runtime].run(request);
     });
     handle("stop", async () => {
       requestGeneration++;
       browser.stop();
-      await Promise.all([node.stop(), python.stop()]);
+      await Promise.all([node.stop(), python.stop(), dotnet.stop()]);
     });
     handle("format", (code, language, options) => {
-      if (languageSchema.parse(language) === "py")
-        throw new Error("Python formatting is not available yet.");
+      if (["py", "cs"].includes(languageSchema.parse(language)))
+        throw new Error(
+          "Formatting is currently available for JavaScript and TypeScript only.",
+        );
       const settings = z
         .object({
           semi: z.boolean(),
@@ -179,8 +207,8 @@ app
       const result = await dialog.showOpenDialog(window, {
         filters: [
           {
-            name: "JavaScript / TypeScript / Python",
-            extensions: ["js", "ts", "jsx", "tsx", "py"],
+            name: "JavaScript / TypeScript / Python / C#",
+            extensions: ["js", "ts", "jsx", "tsx", "py", "cs"],
           },
         ],
         properties: ["openFile"],
@@ -196,7 +224,7 @@ app
     handle("file:export", async (payload) => {
       const tab = tabSchema.parse(payload);
       const result = await dialog.showSaveDialog(window, {
-        defaultPath: `${tab.name.replace(/\.(js|ts|jsx|tsx|py)$/, "")}.${tab.language}`,
+        defaultPath: `${tab.name.replace(/\.(js|ts|jsx|tsx|py|cs)$/, "")}.${tab.language}`,
       });
       if (!result.canceled && result.filePath)
         await writeFile(result.filePath, tab.code);
@@ -285,6 +313,7 @@ app
       void Promise.all([
         node.stop(),
         python.stop(),
+        dotnet.stop(),
         packages.stop(),
         store.flush(),
       ]).finally(() => app.quit());
@@ -294,6 +323,7 @@ app
       browser.stop();
       void node.stop();
       void python.stop();
+      void dotnet.stop();
       void packages.stop();
     });
   })

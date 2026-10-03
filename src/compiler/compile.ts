@@ -19,7 +19,7 @@ export async function compile(
   }
   const { build } = await import("esbuild");
   const { tab } = request;
-  if (tab.language === "py")
+  if (tab.language === "py" || tab.language === "cs")
     throw new Error("Python requires the Python runtime.");
   const hook = `__os_${randomUUID().replaceAll("-", "")}`;
   const filename = `scratch.${tab.language}`;

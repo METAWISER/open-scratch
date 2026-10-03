@@ -545,3 +545,23 @@ h3 {
 .learning-panel input {
   flex: 1;
 }
+
+.lesson-title {
+  font-size: 17px;
+  padding: 0;
+  color: var(--accent);
+  text-align: left;
+}
+.lesson-code {
+  display: block;
+  width: 100%;
+  text-align: left;
+  white-space: normal;
+  padding: 0;
+}
+.lesson-code:hover {
+  outline: 1px solid var(--accent);
+}
+.lesson-code pre {
+  margin: 0;
+}

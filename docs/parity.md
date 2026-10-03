@@ -53,8 +53,19 @@ The documented RunJS environment combines DOM and Node globals. A compatible imp
 | --- | --- | --- |
 | Python 3.10+ | Implemented local process | AST Auto Log, await, original lines, circular containers, bounded output, Stop/replacement integration tests. External interpreter required; no Python heap cap |
 | Python editor | Basic | Monaco highlighting and text editing; no LSP, type diagnostics, formatting, logpoints or pip UI |
-| Learning catalog | Implemented | Ten offline Spanish cards, intent search, language filter, original examples, explicit reference links; all examples executed in tests |
-| Contextual help | Lexical | Word under cursor via Consultar/command; not semantic symbol resolution |
+| Learning catalog | Implemented | Thirteen offline bilingual cards, intent search, language filter, original examples, explicit reference links; all examples executed in tests |
+| Contextual help | Lexical | Word under cursor via Look up/command; not semantic symbol resolution |
 | Example tabs | Implemented | New tab preserves original; Auto Run disabled before example opens |
 | Open-source collaboration | Prepared | MIT, contribution guide, issue/PR templates, code of conduct, security policy, Contribute link; no permissions automatically granted |
-| Additional languages | Not implemented | Go/Rust/C# remain future work; ExecutionEngine contract established |
+| Additional languages | Not implemented | Go/Rust remain future work; ExecutionEngine contract established |
+
+## OpenScratch 0.3 extensions
+
+| Feature | Status | Verification / limits |
+| --- | --- | --- |
+| English and Spanish UI | Implemented | Persisted setting, application/native menus and learning explanations; user/runtime output and Monaco internal commands are not translated |
+| English project documentation | Implemented | Guides, community files, issue/PR templates and website content |
+| C# / .NET | Implemented | SDK 8+ external dependency, temporary offline project, top-level statements/await, compiler/runtime lines, output bounds and cancellable build/run |
+| C# editor and inspection | Basic | Syntax highlighting and text output; no language server, Auto Log, CLR object inspector, NuGet UI or memory cap |
+| Clickable learning examples | Implemented | Title/code/button creates a separate tab with Auto Run off; Copy remains independent |
+| Documentation website | Implemented | Responsive English guides, search, copy, theme, navigation, static hosting workflow |

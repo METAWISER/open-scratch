@@ -1,21 +1,40 @@
-# Motores de lenguaje
+# Language support
 
-OpenScratch 0.2 añade Python a JavaScript/TypeScript/JSX/TSX. Go, Rust y C# no están implementados ni aparecen como opciones.
+Choose a language in the status bar. OpenScratch supports JavaScript, TypeScript, JSX, TSX, Python, and C#. Each tab stores its language, compatible runtime, working directory, and explicitly configured environment variables.
 
-Selecciona PY en Language. Runtime cambia a Python. Instala Python 3.10+ por separado: Windows utiliza `py -3`; macOS/Linux, `python3`. En Tab settings puedes indicar la ruta a un ejecutable, incluido el de un virtualenv (`.venv/Scripts/python.exe` o `.venv/bin/python`). No incluyas argumentos ni comillas alrededor de la ruta. Usa el directorio y las variables explícitas de la pestaña. Si falta el intérprete aparece un error con instrucciones. No se descarga automáticamente.
+| Language                | Runtime            | Installation                                        | Editor capabilities                             |
+| ----------------------- | ------------------ | --------------------------------------------------- | ----------------------------------------------- |
+| JavaScript / TypeScript | Node.js or Browser | Included                                            | Completion, hover, type diagnostics, formatting |
+| JSX / TSX               | Node.js or Browser | Included; install React packages for React previews | TypeScript language service                     |
+| Python                  | Python process     | Python 3.10+                                        | Syntax highlighting and text editing            |
+| C#                      | .NET process       | .NET SDK 8+                                         | Syntax highlighting and text editing            |
 
-Importa desde el directorio de trabajo y las dependencias del intérprete. npm solo gestiona JS/TS; prepara entornos pip fuera de OpenScratch.
+Go and Rust are not implemented. Python and C# do not yet have a language server, semantic completion, an integrated formatter, or package manager. Runtime/compiler errors remain visible in the output. Application language does not translate user code, compiler diagnostics, or package logs.
 
-Python usa un proceso dedicado, spawn sin shell, entorno heredado restringido, UTF-8, runId y generaciones contra resultados obsoletos. Stop termina el árbol de procesos como en Node. Se aplican timeout y límites de inspección/salida (4 MB de transporte). El límite de heap Node no se aplica: no hay límite de memoria Python. No es un sandbox.
+## Python
 
-Auto Log instrumenta expresiones superiores con `ast`, conserva líneas y docstrings y evalúa cada expresión una vez. Omite resultados None. Top-level await usa `PyCF_ALLOW_TOP_LEVEL_AWAIT` y asyncio; las tareas pendientes se cancelan al finalizar ese event loop. Cada Run crea un namespace nuevo. stdin entrega el snippet: `input()` interactivo no está soportado.
+Select Python. Windows uses `py -3`; macOS and Linux use `python3`. Tab settings accepts an executable path, including a virtual environment such as `.venv/Scripts/python.exe` or `.venv/bin/python`. Do not include arguments or quotes around the path. Missing interpreters produce an actionable error; nothing is downloaded automatically.
 
-Captura print, stdout/stderr y excepciones con líneas de scratch.py. print puede generar entradas separadas. El inspector expande contenedores builtin exactos, detecta ciclos y limita volumen. No llama a repr personalizado ni propiedades: las instancias personalizadas aparecen opacas. La salida nativa puede no tener línea. No protege contra código que manipule deliberadamente el protocolo.
+Imports use the working directory and selected interpreter's dependencies. Prepare pip environments outside the app; npm packages only apply to JS/TS.
 
-Monaco ofrece resaltado y edición Python. No hay servidor de lenguaje, análisis de tipos, formateador, logpoints ni magic comments Python. La barra de estado y los controles indican estas diferencias. JS/TS conserva sus capacidades.
+Auto Log instruments top-level expressions with Python's `ast` module. It preserves original lines and docstrings, evaluates expressions once, and omits None results. Top-level await uses `PyCF_ALLOW_TOP_LEVEL_AWAIT` and asyncio; pending tasks are cancelled when that event loop ends. Each Run uses a new namespace. Interactive `input()` is not supported because stdin delivers the snippet.
 
-## Otro motor
+print, stdout/stderr, and exceptions are captured. Built-in containers expand with cycle detection and depth/volume limits. Custom objects remain opaque: inspection does not invoke properties or custom repr methods. Native output may lack a source line. Python does not support logpoints or magic comments.
 
-Implementa `src/runtime/engine.ts` (`ExecutionEngine.run/stop`) y compón el motor en main. Extiende esquemas, selección del editor e importación/exportación. Ejecuta en un proceso cancelable con argumentos estructurados, RunEvent validado y límites. Prueba sustitución, salida masiva, errores y Stop con un bucle activo. Declara capacidades e instalación, sin anunciar equivalencia entre lenguajes.
+## C#
 
-Los contratos IA aceptan el lenguaje sin depender del motor. El estado v1 añade pythonExecutable vacío por defecto para cargar instalaciones anteriores. Workspaces de 0.2 con Python no son compatibles con 0.1.
+Select C#. The app locates `dotnet` on PATH, or uses the executable path in Tab settings. Install the **SDK**, not just the runtime. OpenScratch generates a temporary console project for the installed SDK's major framework, compiles it without package sources, then runs the resulting DLL in a dedicated process. A normal SDK installation includes the framework reference packs needed for offline compilation.
+
+Use top-level C# statements and `Console.WriteLine` for output. `await`, classes, and standard-library APIs such as LINQ work. Auto Log is disabled for C#: arbitrary expression statements such as `1 + 2;` are not automatically rewritten. There is no NuGet manager or support for script-only `#r` directives. Dependencies cannot be added through npm.
+
+Compilation errors retain original snippet line numbers using a line directive; runtime stack frames include original lines when the SDK emits debug symbols. Output is text, not an expandable CLR object inspector. Both build and execution are cancellable. Compilation time counts toward the configured lifetime, so increase it if the SDK is slow on first use.
+
+## Execution boundaries
+
+All three native runtimes run with your user permissions, not in a hostile-code sandbox. Stop terminates the active process tree; deliberately detached children are outside that guarantee. Timeout and output limits apply. The Node heap setting does **not** limit Python or C# memory. The .NET runner opts out of CLI telemetry and uses no package sources. Explicit snippets can still access the network or filesystem.
+
+## Adding another engine
+
+Implement `src/runtime/engine.ts`, compose the engine in main, and extend the language/runtime schemas and selectors. Use structured process arguments, validated RunEvent messages, cancellation, runId filtering, and bounded output. Test replacement, errors, flooding, and stopping an active loop. State what the editor supports; do not imply all languages have identical features.
+
+Version 1 persisted state defaults missing executable fields to empty strings and missing interface locale to English. Older app versions cannot open workspaces containing newly introduced languages.

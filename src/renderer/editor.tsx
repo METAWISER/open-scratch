@@ -1,3 +1,4 @@
+import { translate } from "../shared/i18n";
 import { useEffect, useRef } from "react";
 import * as monaco from "monaco-editor";
 import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
@@ -101,11 +102,13 @@ export function Editor({
     if (!model)
       model = monaco.editor.createModel(
         tab.code,
-        tab.language === "py"
-          ? "python"
-          : ["ts", "tsx"].includes(tab.language)
-            ? "typescript"
-            : "javascript",
+        tab.language === "cs"
+          ? "csharp"
+          : tab.language === "py"
+            ? "python"
+            : ["ts", "tsx"].includes(tab.language)
+              ? "typescript"
+              : "javascript",
         uri,
       );
     editor.current?.setModel(model);
@@ -161,11 +164,13 @@ export function Editor({
         options: {
           isWholeLine: true,
           glyphMarginClassName: "logpoint",
-          glyphMarginHoverMessage: { value: "Logpoint · F9 to remove" },
+          glyphMarginHoverMessage: {
+            value: translate(settings.locale, "Logpoint · F9 to remove"),
+          },
         },
       })),
     );
     return () => decorations?.clear();
-  }, [tab.logpoints, tab.id]);
+  }, [tab.logpoints, tab.id, settings.locale]);
   return <div className="editor" ref={host} data-testid="editor" />;
 }

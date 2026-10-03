@@ -1,13 +1,14 @@
-## Problema y cambio
+## Problem and change
 
-Describe el comportamiento anterior y el resultado esperado. Referencia el issue si existe.
+Describe the previous behavior and the expected result. Link the issue if available.
 
-## Comprobación
+## Validation
 
 - [ ] `pnpm check`
-- [ ] `pnpm test:e2e` (o explicación concreta de por qué no fue posible)
-- [ ] Pruebas relevantes para el cambio
-- [ ] Documentación y matriz de paridad actualizadas si corresponde
-- [ ] Sin secretos, telemetría ni ejecución automática de propuestas de IA
+- [ ] `pnpm test:e2e` (or explain why unavailable)
+- [ ] `pnpm docs:build` and `pnpm test:docs` for website changes
+- [ ] Relevant regression tests
+- [ ] Documentation, translations, and parity matrix updated where needed
+- [ ] No secrets, telemetry, or automatic execution of AI proposals
 
-Indica sistemas probados y limitaciones. Para cambios visuales, incluye una captura sin datos privados.
+List tested systems and limitations. Include screenshots without private data for visual changes.
