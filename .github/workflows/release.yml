@@ -1,0 +1,99 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      RELEASE_TAG: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.19.0
+      - run: node scripts/release-notes.mjs
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm run licenses
+      - run: pnpm exec electron-builder --dir --win --x64 --publish never
+      - name: Test packaged executable
+        shell: pwsh
+        run: |
+          $env:OPENSCRATCH_TEST_EXECUTABLE = (Resolve-Path 'release/win-unpacked/OpenScratch.exe').Path
+          pnpm exec playwright test
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - run: pnpm exec electron-builder --prepackaged release/win-unpacked --win nsis --x64 --publish never
+      - name: Collect installer and checksum
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path release-assets -Force | Out-Null
+          $installers = @(Get-ChildItem -LiteralPath release -Filter '*.exe' -File)
+          if ($installers.Count -ne 1) { throw 'Expected exactly one Windows installer' }
+          Copy-Item -LiteralPath $installers[0].FullName -Destination release-assets
+          $digest = (Get-FileHash -LiteralPath $installers[0].FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$digest  $($installers[0].Name)" | Set-Content -LiteralPath release-assets/SHA256SUMS.txt -Encoding utf8NoBOM
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-assets
+          path: release-assets/*
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-meta
+          path: release-meta/*
+          if-no-files-found: error
+          retention-days: 14
+  publish:
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-assets
+          path: release-assets
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-meta
+          path: release-meta
+      - name: Publish complete GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          # Never replace an existing published version. Retry a failed upload by rerunning the draft.
+          if gh release view "$RELEASE_TAG" --json isDraft > existing-release.json 2>/dev/null; then
+            test "$(jq -r .isDraft existing-release.json)" = true || { echo 'Release already published; nothing to change.'; exit 0; }
+          else
+            gh release create "$RELEASE_TAG" --verify-tag --draft --title "OpenScratch $RELEASE_TAG" --notes-file release-meta/notes.md
+          fi
+          gh release upload "$RELEASE_TAG" release-assets/* --clobber
+          if [[ "$RELEASE_TAG" == *-* ]]; then
+            gh release edit "$RELEASE_TAG" --notes-file release-meta/notes.md --draft=false --prerelease
+          else
+            gh release edit "$RELEASE_TAG" --notes-file release-meta/notes.md --draft=false
+          fi

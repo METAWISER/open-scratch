@@ -94,3 +94,7 @@ Original rounded SVG controls and a shared code-and-spark mark replace font-depe
 - Cut/Copy/Paste restored to the editor context menu using native Electron clipboard commands, retaining undo and selection behavior.
 - User-configured Chat Completions generator: endpoint/model/key, optional current-code context, streaming, cancellation, read-only diff and explicit application with Auto Run disabled.
 - Provider-specific model compatibility, native non-compatible protocols and multi-turn chat remain outside verified scope. See [AI guide](ai-provider.md).
+
+## Release distribution workflow
+
+Matching version tags trigger a validated, tested Windows x64 release with curated changelog notes, installer and SHA256 checksums. Manual workflow runs build/test without publishing. No automatic application updater, signed installer or macOS/Linux release asset is claimed. See [release procedure](releases.md).

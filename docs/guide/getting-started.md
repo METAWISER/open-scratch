@@ -35,7 +35,7 @@ Compiler messages, package logs, user output, and Monaco's built-in editor comma
 
 ## Install or build
 
-The source is available on [GitHub](https://github.com/METAWISER/open-scratch). There is no published installer download unless the repository's Releases page lists one. Development installers produced locally are unsigned.
+The source is available on [GitHub](https://github.com/METAWISER/open-scratch). Check [GitHub Releases](https://github.com/METAWISER/open-scratch/releases) for published versions, change notes and Windows installers. A version is available only when listed there. Builds are currently unsigned. See [how versions are published](../releases.md).
 
 ```sh
 git clone https://github.com/METAWISER/open-scratch.git

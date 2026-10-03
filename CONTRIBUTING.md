@@ -32,6 +32,6 @@ For every change, review whether the application documentation and documentation
 
 ## Review and community
 
-METAWISER currently maintains the project and makes integration decisions. Keep PRs focused, pass CI, and obtain review before merging. Releases are not published automatically. Read [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) and [SECURITY.md](SECURITY.md).
+METAWISER currently maintains the project and makes integration decisions. Keep PRs focused, pass CI, and obtain review before merging. Ordinary commits do not publish releases. Maintainers publish a version by pushing its matching `vX.Y.Z` tag; the release workflow validates, tests and publishes the installer with its changelog entry. Every published version must have release notes. See [release procedure](docs/releases.md). Read [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) and [SECURITY.md](SECURITY.md).
 
 Templates do not grant write permission or guarantee response times. Discuss additional runtimes, language servers, and package managers in an issue before starting a large implementation.

@@ -67,6 +67,7 @@ test("mobile navigation and every guide render without missing content", async (
     "ai",
     "parity",
     "contribute",
+    "releases",
   ]) {
     await page.goto(`/?page=${id}`);
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();

@@ -7,3 +7,6 @@ coverage/
 .test-data/
 *.log
 dist-docs/
+
+release-meta/
+release-assets/

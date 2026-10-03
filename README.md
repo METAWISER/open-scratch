@@ -118,3 +118,9 @@ pnpm test:docs      # browser checks against a local documentation server
 ```
 
 The Pages workflow publishes documentation on changes to main; desktop installers are never uploaded by it. See [website maintenance](docs/website.md).
+
+## Releases
+
+Find official version notes and downloads in [GitHub Releases](https://github.com/METAWISER/open-scratch/releases). Every published version includes curated changes, a Windows x64 installer and a SHA256 checksum; source archives are supplied by GitHub. Builds are currently unsigned. A version is available only when its Release is listed.
+
+Maintainers publish matching `vX.Y.Z` tags after updating [CHANGELOG.md](CHANGELOG.md) and reviewing the docs. Normal commits do not publish releases. A manual Release workflow run is a build/test dry run. See [release procedure and limitations](docs/releases.md).

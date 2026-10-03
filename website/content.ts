@@ -73,6 +73,12 @@ export const pages = [
     source: "docs/parity.md",
   },
   {
+    id: "releases",
+    title: "Releases & downloads",
+    group: "Project",
+    source: "docs/releases.md",
+  },
+  {
     id: "contribute",
     title: "Contributing",
     group: "Project",
