@@ -1,5 +1,53 @@
 export type Locale = "en" | "es";
 export const spanish: Record<string, string> = {
+  "Provider settings": "Configuración del proveedor",
+  "Current code exceeds the 100,000-character AI context limit.":
+    "El código supera el límite de contexto de IA de 100.000 caracteres.",
+  "Generate code with AI": "Generar código con IA",
+  "API base URL": "URL base de la API",
+  Model: "Modelo",
+  "API key": "Clave API",
+  "Model ID from your provider": "Identificador del modelo de tu proveedor",
+  "Stored key available; leave blank to keep":
+    "Hay una clave guardada; deja vacío para conservarla",
+  "Optional for local services": "Opcional para servicios locales",
+  "Remember key in system secure storage":
+    "Recordar clave en el almacenamiento seguro del sistema",
+  "New keys are session-only unless Remember is selected. Keys are bound to the exact endpoint.":
+    "Las claves nuevas solo duran esta sesión salvo que selecciones Recordar. Se vinculan al endpoint exacto.",
+  "Secure storage unavailable. New keys stay in memory for this session.":
+    "Almacenamiento seguro no disponible. Las claves nuevas se mantienen en memoria durante esta sesión.",
+  "Save AI settings": "Guardar configuración de IA",
+  "Remove saved key": "Eliminar clave guardada",
+  "Describe the code to generate": "Describe el código que quieres generar",
+  "Include current tab code": "Incluir código de la pestaña actual",
+  "Review what will be sent": "Revisar lo que se enviará",
+  "No prompt yet.": "Todavía no hay instrucciones.",
+  "Generate code": "Generar código",
+  "Cancel generation": "Cancelar generación",
+  "Generating code": "Generando código",
+  "Waiting for provider…": "Esperando al proveedor…",
+  "Review changes before applying": "Revisa los cambios antes de aplicarlos",
+  "Accept and apply": "Aceptar y aplicar",
+  "Discard proposal": "Descartar propuesta",
+  "Code changed after generation. Generate again before applying.":
+    "El código cambió después de generar. Vuelve a generar antes de aplicar.",
+  "Red lines are removed; green lines are added. Applying replaces this tab and turns Auto Run off. Nothing runs automatically.":
+    "Las líneas rojas se eliminan; las verdes se añaden. Aplicar reemplaza esta pestaña y desactiva Auto Run. Nada se ejecuta automáticamente.",
+  "Use your own OpenAI-compatible service. No OpenScratch AI quota; your provider may charge for requests.":
+    "Usa tu servicio compatible con OpenAI. OpenScratch no impone cuotas de IA; tu proveedor puede cobrar las solicitudes.",
+  "Only your prompt, language, runtime and optionally this code are sent, with an instruction to return source code. Environment variables, other tabs, output and file paths are excluded. Review code for embedded secrets.":
+    "Solo se envían tus instrucciones, lenguaje, runtime y opcionalmente este código, con la instrucción de devolver código fuente. Se excluyen variables de entorno, otras pestañas, resultados y rutas. Revisa que el código no contenga secretos.",
+  "Unable to load AI settings.": "No se pudo cargar la configuración de IA.",
+  "AI request failed. Check endpoint, model and secure storage.":
+    "Falló la solicitud de IA. Revisa endpoint, modelo y almacenamiento seguro.",
+  "Unable to save AI settings.": "No se pudo guardar la configuración de IA.",
+  "Unable to remove key.": "No se pudo eliminar la clave.",
+  "Generation cancelled or timed out.":
+    "Generación cancelada o tiempo de espera agotado.",
+  "AI is optional. Configure your provider under Generate code with AI.":
+    "La IA es opcional. Configura tu proveedor en Generar código con IA.",
+
   "Saved snippet": "Fragmento guardado",
   "New snippet": "Nuevo fragmento",
   Description: "Descripción",

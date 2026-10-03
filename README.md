@@ -2,7 +2,7 @@
 
 <img src="assets/mark.svg" width="64" height="64" alt="OpenScratch code-and-spark mark" />
 
-A free, local desktop playground for JavaScript, TypeScript, JSX, TSX, Python and C#. Original MIT implementation inspired by the interaction patterns documented by RunJS. No account, telemetry, subscription, cloud service or execution quotas. TypeScript is included.
+A free, local desktop playground for JavaScript, TypeScript, JSX, TSX, Python and C#. Original MIT implementation inspired by the interaction patterns documented by RunJS. No required account, telemetry, subscription, mandatory cloud service or execution quotas. TypeScript is included.
 
 The desktop app and documentation share an original violet, coral and mint identity, rounded SVG icons and matching light/dark themes. See [visual identity](docs/branding.md) for assets and contributor guidance.
 
@@ -40,6 +40,10 @@ Choose a language when creating a tab with **+**, or change language and runtime
 Preferences includes line numbers, ligatures, bracket closing, whitespace, active-line highlighting, completion, linting, hover and signature help. Hide undefined expression results independently of explicit console output. Expand/collapse displayed objects together, and hover results to highlight their source line. See the [RunJS capability audit](docs/runjs-audit.md) for implemented improvements and remaining gaps.
 
 Auto Run has a configurable debounce and supersedes the previous process. Stop terminates the execution context, including infinite loops. Settings include theme, font, wrapping, format preferences, output limits and lifetime. Set lifetime to 0 for persistent preview/server work and stop it manually. Node scripts have user permissions: read [security notes](docs/security.md).
+
+### Optional AI generation
+
+Open **Preferences → Generate code with AI**. Enter your provider's API base URL, model and key (or a local compatible endpoint). Choose whether to include current code, generate and review the diff before applying. Applying turns Auto Run off; nothing executes automatically. Keys are session-only unless OS-encrypted persistence is explicitly selected. See [AI setup, compatibility and privacy](docs/ai-provider.md).
 
 ### Node
 
@@ -89,7 +93,7 @@ Documented RunJS syntax implemented here: trailing `//?`, inline `/*?*/`, and a 
 - `src/compiler`: TypeScript AST selection, MagicString mapping and esbuild transpilation/bundling.
 - `src/runtime`: disposable Node/Python/.NET processes, Browser capture, bounded serialization.
 - `src/shared`: versioned state schema and bridge/event contracts.
-- `src/ai`: optional provider/transport/credentials contracts and explicit context construction, streaming/cancellation and proposal acceptance. No chat or network provider is active. See [AI integration](docs/ai-provider.md).
+- `src/ai`: optional provider/transport/credentials contracts and explicit context construction, streaming/cancellation and proposal acceptance. Includes an opt-in OpenAI-compatible generator with endpoint-bound keys and a reviewable Monaco diff. See [AI integration](docs/ai-provider.md).
 
 Version 1 persistence rejects unknown versions and preserves invalid files instead of silently overwriting data. Future schema changes must add migrations. Older v1 state defaults the new Python executable field to an empty string; Python tabs require 0.2+. Dependencies and snippet execution are independent of AI.
 

@@ -35,7 +35,7 @@ Original MIT implementation and visual identity. **Not complete RunJS parity.** 
 | Browser + Node | DOM and Node in the same realm | Not implemented | Design/security implications in security.md. Not exposed as a selector or replaced with DOM emulation |
 | Logpoints | Gutter/F9, clear all, session-only; nested expressions/declarations/returns/arrow bodies | Partial parity | AST tests. Not every intermediate chain segment/callback argument can be selected by line; multi-expression lines may log multiple values |
 | Magic comments | `//?`, `/*?*/`, `$` transforms, if/while conditions, for-in/of iterations | Partial parity | AST syntax/transform/loop tests. Method-reference markers before calls rejected to preserve this; not all classic-for/control-flow forms supported |
-| AI | Provider/configuration/transport/credentials contracts, streaming, cancellation, acceptance | Extension ready | Injection/context/cancellation/proposal tests. No live adapters/chat/diff viewer; no code transmission or auto-execution |
+| AI | Provider/configuration/transport/credentials contracts, streaming, cancellation, acceptance | Partial | Opt-in OpenAI-compatible generator, encrypted/session keys, streaming/cancel and accepted Monaco diff; no multi-turn chat or autonomous execution |
 | Offline/no account | Core and existing packages work locally | Implemented | Electron network-emulation offline test; no account, AI or telemetry requirement |
 | Distribution | Installers, MIT, notices, scripts, CI | See verification record | Exact host package evidence in verification.md. See historical CI evidence; signing/notarization not verified |
 
@@ -88,3 +88,9 @@ The documented RunJS environment combines DOM and Node globals. A compatible imp
 ## Visual identity update (0.5.1)
 
 Original rounded SVG controls and a shared code-and-spark mark replace font-dependent toolbar symbols. Desktop, Monaco themes and documentation use coordinated violet/coral/mint accents, accessible labels, focus states and reduced-motion support. See [branding](branding.md) for assets and regeneration commands. No execution behavior or RunJS parity claim changes.
+
+## 0.6 clipboard and optional AI
+
+- Cut/Copy/Paste restored to the editor context menu using native Electron clipboard commands, retaining undo and selection behavior.
+- User-configured Chat Completions generator: endpoint/model/key, optional current-code context, streaming, cancellation, read-only diff and explicit application with Auto Run disabled.
+- Provider-specific model compatibility, native non-compatible protocols and multi-turn chat remain outside verified scope. See [AI guide](ai-provider.md).

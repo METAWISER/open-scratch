@@ -41,3 +41,7 @@ OpenScratch already has JS/TS/JSX/TSX, Node and Browser execution, asynchronous 
 The guides for [Canvas](https://runjs.app/docs/guides/canvas), [HTTP](https://runjs.app/docs/guides/http-requests), [databases](https://runjs.app/docs/guides/database-queries), [servers](https://runjs.app/docs/guides/server), [React](https://runjs.app/docs/guides/react), [P5](https://runjs.app/docs/guides/p5), [Three.js](https://runjs.app/docs/guides/three-js) and [Web Audio](https://runjs.app/docs/guides/web-audio) describe use cases built on runtimes and packages, not standalone editors we should pretend to implement. OpenScratch supports the underlying Node or Browser APIs; each library, native addon, permission and audio device still requires its own check. Dedicated HTML/CSS source editors are not established as a RunJS requirement by the reviewed web-view documentation.
 
 No RunJS source, artwork or brand resources are copied. Subscription, license activation and cloud dependencies are deliberately excluded. See parity.md for implementation status and verification.md for actual checks.
+
+## Follow-up 0.6
+
+An opt-in Chat Completions adapter and code-generation UI now implement streaming, endpoint/model/key configuration, context review and accepted diffs. Multi-turn chat, model discovery and explanation of output remain pending. Clipboard editing is restored in the custom context menu.

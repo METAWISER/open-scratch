@@ -1,3 +1,5 @@
+import { createServer } from "node:http";
+import { createHash } from "node:crypto";
 import {
   test,
   expect,
@@ -624,4 +626,161 @@ test("Browser loads local stylesheets and keeps source locations and bridge isol
       .filter({ hasText: "rgb(12, 34, 56)" })
       .locator(".source-line"),
   ).toHaveText("2");
+});
+
+test("context menu cut, copy, paste and undo preserve editor text", async () => {
+  await page.getByTitle("New tab", { exact: true }).click();
+  await page
+    .getByRole("button", { name: "TypeScript Node.js", exact: true })
+    .click();
+  await code("const clipboardValue = 42;");
+  const area = page.locator(".monaco-editor textarea").first();
+  await area.focus();
+  await page.keyboard.press("ControlOrMeta+A");
+  await page
+    .getByTestId("editor")
+    .click({ button: "right", position: { x: 190, y: 28 } });
+  await page.getByRole("menuitem", { name: /^Copy/ }).click();
+  expect(await app.evaluate(({ clipboard }) => clipboard.readText())).toBe(
+    "const clipboardValue = 42;",
+  );
+  await page.keyboard.press("Shift+F10");
+  await page.getByRole("menuitem", { name: /^Cut/ }).click();
+  await expect
+    .poll(async () => {
+      const s = await page.evaluate(() => window.openscratch.load());
+      return s.tabs.find((t) => t.id === s.active)?.code;
+    })
+    .toBe("");
+  await page.keyboard.press("Shift+F10");
+  await page.getByRole("menuitem", { name: /^Paste/ }).click();
+  await expect
+    .poll(async () => {
+      const s = await page.evaluate(() => window.openscratch.load());
+      return s.tabs.find((t) => t.id === s.active)?.code;
+    })
+    .toBe("const clipboardValue = 42;");
+  await page.keyboard.press("ControlOrMeta+z");
+  await expect
+    .poll(async () => {
+      const s = await page.evaluate(() => window.openscratch.load());
+      return s.tabs.find((t) => t.id === s.active)?.code;
+    })
+    .toBe("");
+});
+
+test("AI generation streams from a user endpoint and requires diff acceptance without Auto Run", async () => {
+  let requests = 0,
+    received = "",
+    authorization = "";
+  const server = createServer(async (req, res) => {
+    requests++;
+    authorization = req.headers.authorization ?? "";
+    for await (const chunk of req) received += chunk;
+    res.writeHead(200, { "content-type": "text/event-stream" });
+    res.write(
+      "data: " +
+        JSON.stringify({
+          choices: [
+            {
+              delta: { content: 'console.log("AI proposal");' },
+              finish_reason: null,
+            },
+          ],
+        }) +
+        "\n\n",
+    );
+    setTimeout(
+      () =>
+        res.end(
+          "data: " +
+            JSON.stringify({
+              choices: [{ delta: {}, finish_reason: "stop" }],
+            }) +
+            "\n\ndata: [DONE]\n\n",
+        ),
+      150,
+    );
+  });
+  await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+  try {
+    await code("// private context must be excluded");
+    await page
+      .getByRole("button", { name: "Preferences", exact: true })
+      .click();
+    await page.getByLabel("Auto Run", { exact: true }).check();
+    await page
+      .getByRole("button", { name: "Generate code with AI", exact: true })
+      .click();
+    await page
+      .getByLabel("API base URL", { exact: true })
+      .fill(
+        `http://127.0.0.1:${(server.address() as { port: number }).port}/v1`,
+      );
+    await page.getByLabel("Model", { exact: true }).fill("local-test-model");
+    await page.getByLabel("API key", { exact: true }).fill("TEST_KEY_NOT_REAL");
+    await page
+      .getByLabel("Describe the code to generate", { exact: true })
+      .fill("Write a greeting");
+    const remember = page.getByLabel("Remember key in system secure storage", {
+      exact: true,
+    });
+    const secure = await remember.isEnabled();
+    if (secure) await remember.check();
+    expect(requests).toBe(0);
+    await page
+      .getByRole("button", { name: "Generate code", exact: true })
+      .click();
+    await expect(
+      page.getByRole("button", { name: "Accept and apply", exact: true }),
+    ).toBeVisible();
+    expect(requests).toBe(1);
+    expect(authorization).toBe("Bearer TEST_KEY_NOT_REAL");
+    if (secure) {
+      const endpoint = `http://127.0.0.1:${(server.address() as { port: number }).port}/v1`;
+      const id = createHash("sha256").update(endpoint).digest("hex");
+      const stored = await readFile(
+        join(directory, "ai-credentials", id + ".secret"),
+        "utf8",
+      );
+      expect(stored).not.toContain("TEST_KEY_NOT_REAL");
+      const decoded = await app.evaluate(
+        ({ safeStorage }, blob) =>
+          safeStorage.decryptString(Buffer.from(blob, "base64")),
+        stored,
+      );
+      expect(decoded).toBe("TEST_KEY_NOT_REAL");
+    }
+    expect(
+      JSON.stringify(await page.evaluate(() => window.openscratch.aiStatus())),
+    ).not.toContain("TEST_KEY_NOT_REAL");
+    expect(received).not.toContain("private context");
+    await expect(page.locator(".monaco-diff-editor")).toBeVisible();
+    const before = await page.evaluate(() => window.openscratch.load());
+    expect(before.tabs.find((t) => t.id === before.active)?.code).toBe(
+      "// private context must be excluded",
+    );
+    await page
+      .getByRole("button", { name: "Accept and apply", exact: true })
+      .scrollIntoViewIfNeeded();
+    await page.screenshot({ path: "test-results/ai-diff.png" });
+    await page
+      .getByRole("button", { name: "Accept and apply", exact: true })
+      .click();
+    await expect
+      .poll(async () => {
+        const s = await page.evaluate(() => window.openscratch.load());
+        return {
+          code: s.tabs.find((t) => t.id === s.active)?.code,
+          autoRun: s.settings.autoRun,
+        };
+      })
+      .toEqual({ code: 'console.log("AI proposal");', autoRun: false });
+    await expect(page.getByTestId("output")).not.toContainText("AI proposal");
+    await page.getByRole("button", { name: "▶ Run", exact: true }).click();
+    await expect(page.getByTestId("output")).toContainText("AI proposal");
+  } finally {
+    server.closeAllConnections();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+  }
 });

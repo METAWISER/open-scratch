@@ -1,6 +1,6 @@
 {
   "name": "openscratch",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "private": true,
   "description": "A local open-source JavaScript, TypeScript, Python and C# playground",
   "author": "OpenScratch contributors",

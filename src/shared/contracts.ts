@@ -1,3 +1,4 @@
+import type { AISettings, AIStatus, AIGeneration, AIEvent } from "../ai/wire";
 import { z } from "zod";
 export const languageSchema = z.enum(["js", "ts", "jsx", "tsx", "py", "cs"]);
 export const limitsSchema = z.object({
@@ -92,6 +93,17 @@ export interface PackageInfo {
   description?: string;
 }
 export interface Bridge {
+  clipboard(action: "cut" | "copy" | "paste"): Promise<void>;
+  aiStatus(): Promise<AIStatus>;
+  aiConfigure(
+    settings: AISettings,
+    key?: string,
+    remember?: boolean,
+  ): Promise<AIStatus>;
+  aiForgetKey(): Promise<AIStatus>;
+  aiGenerate(request: AIGeneration): Promise<void>;
+  aiCancel(id: string): Promise<void>;
+  onAIEvent(listener: (event: AIEvent) => void): () => void;
   openReference(id: string): Promise<void>;
   load(): Promise<AppState>;
   save(state: AppState): Promise<void>;

@@ -1,3 +1,15 @@
+# Verification record — OpenScratch 0.6 clipboard and AI generation
+
+- Windows x64: strict TypeScript, ESLint and production build pass. The full 52-test Vitest suite passed; the AI file then passed all five tests after adding fragmented UTF-8 and stale-generation coverage (53 distinct passing tests in total).
+- **11 desktop scenarios pass against the packaged Windows executable**, including actual right-click Copy, keyboard Cut/Paste, undo, and an AI request through real main-process HTTP to a disposable local test server.
+- AI E2E verifies no request before Generate, Bearer auth, current code excluded by default, code unchanged before acceptance, actual Monaco diff, Auto Run disabled on application, and execution only after explicit Run. On this Windows host the test also persisted and decrypted a test-only key through real Electron safeStorage, confirmed ciphertext on disk and confirmed status IPC contains no key.
+- Adapter/controller tests cover byte-fragmented UTF-8/SSE, endpoint validation, session-only key persistence boundaries, endpoint binding, removal, cancellation, stale request suppression, incomplete/oversized responses and sanitized authentication errors. Existing service tests cover stale-original rejection.
+- **Two documentation browser scenarios** and the documentation production build pass. AI setup, endpoint compatibility, privacy, context consent, technical bounds and clipboard usage are documented. The AI configuration/diff screenshot was inspected.
+- No paid/cloud model request was made and no real API key was supplied. The local server is a test fixture, not a bundled mock provider. Compatibility with individual hosted models or a running Ollama installation remains unverified.
+- Local unsigned Windows output: `release/v0.6.0/win-unpacked/OpenScratch.exe` and `release/v0.6.0/OpenScratch Setup 0.6.0.exe`. No installer-wizard execution, release publication or local macOS/Linux check is claimed. Remote CI results are separate.
+
+---
+
 # Verification record — OpenScratch 0.5.1 visual identity
 
 - Windows x64: TypeScript, ESLint and desktop production build pass; all **48 unit/integration tests** pass.

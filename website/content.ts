@@ -62,7 +62,7 @@ export const pages = [
   },
   {
     id: "ai",
-    title: "AI provider integration",
+    title: "AI generation & providers",
     group: "Project",
     source: "docs/ai-provider.md",
   },

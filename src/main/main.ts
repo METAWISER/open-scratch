@@ -1,3 +1,4 @@
+import { AIController } from "../ai/controller";
 import { randomUUID } from "node:crypto";
 import { exportLibrary, importLibrary } from "../shared/snippets";
 import {
@@ -148,6 +149,25 @@ app
           throw new Error("Untrusted IPC sender");
         return listener(...args);
       });
+    const ai = new AIController(
+      root,
+      (event) => {
+        if (!window.isDestroyed()) window.webContents.send("ai:event", event);
+      },
+      secrets,
+    );
+    handle("clipboard", (action) => {
+      window.webContents[z.enum(["cut", "copy", "paste"]).parse(action)]();
+    });
+    handle("ai:status", () => ai.status());
+    handle("ai:configure", (settings, key, remember) =>
+      ai.configure(settings, key, remember),
+    );
+    handle("ai:forget", () => ai.forget());
+    handle("ai:generate", (request) => ai.generate(request));
+    handle("ai:cancel", (id) => ai.cancel(z.string().uuid().parse(id)));
+    window.webContents.on("render-process-gone", () => ai.cancel());
+    window.webContents.on("did-start-navigation", () => ai.cancel());
     handle("reference:open", (id) => {
       const url = referenceFor(z.string().max(100).parse(id));
       if (!url) throw new Error("Unknown reference");
@@ -330,6 +350,7 @@ app
       if (quitting) return;
       event.preventDefault();
       quitting = true;
+      ai.cancel();
       requestGeneration++;
       browser.stop();
       void Promise.all([
@@ -341,6 +362,7 @@ app
       ]).finally(() => app.quit());
     });
     window.on("close", () => {
+      ai.cancel();
       requestGeneration++;
       browser.stop();
       void node.stop();

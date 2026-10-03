@@ -1,3 +1,5 @@
+import { AIPanel } from "./AIPanel";
+import { acceptProposal } from "../ai/service";
 import { Icon, BrandMark, type IconName } from "../shared/Icon";
 import { LocaleContext } from "./i18n";
 import { translate } from "../shared/i18n";
@@ -25,6 +27,7 @@ declare global {
   }
 }
 type Modal =
+  | "ai"
   | "new-tab"
   | "learn"
   | "preferences"
@@ -349,6 +352,7 @@ function App() {
       () => void window.openscratch.exportFile(tab).catch(fail),
     ],
     [tr("Clear results"), () => setOutputs((s) => ({ ...s, [tab.id]: [] }))],
+    [tr("Generate code with AI"), () => setModal("ai")],
     [tr("Preferences"), () => setModal("preferences")],
     [
       tr("npm packages"),
@@ -721,7 +725,7 @@ function App() {
             }}
           >
             <section
-              className="modal"
+              className={`modal ${modal === "ai" ? "ai-modal" : ""}`}
               role="dialog"
               aria-modal="true"
               aria-labelledby="dialog-title"
@@ -730,6 +734,7 @@ function App() {
                 <h2 id="dialog-title">
                   {
                     {
+                      ai: tr("Generate code with AI"),
                       "new-tab": tr("Choose a language"),
                       learn: tr("Learn and reference"),
                       preferences: tr("Preferences"),
@@ -742,6 +747,36 @@ function App() {
                 </h2>
                 <button onClick={() => setModal(null)}>✕</button>
               </div>
+              {modal === "ai" && (
+                <AIPanel
+                  tab={tab}
+                  onApply={(original, replacement) => {
+                    const state = current.current;
+                    const target = state.tabs.find((t) => t.id === original.id);
+                    if (
+                      !target ||
+                      state.active !== original.id ||
+                      target.language !== original.language ||
+                      target.runtime !== original.runtime
+                    )
+                      throw new Error("Tab changed");
+                    const code = acceptProposal(
+                      target.code,
+                      { original: original.code, replacement },
+                      true,
+                    );
+                    stop();
+                    setState((s) => ({
+                      ...s,
+                      settings: { ...s.settings, autoRun: false },
+                      tabs: s.tabs.map((t) =>
+                        t.id === target.id ? { ...t, code } : t,
+                      ),
+                    }));
+                    setModal(null);
+                  }}
+                />
+              )}
               {modal === "new-tab" && (
                 <div className="language-grid">
                   {(
@@ -969,7 +1004,10 @@ function App() {
               {modal === "preferences" && (
                 <>
                   <div className="settings-links">
-                    {" "}
+                    <button onClick={() => setModal("ai")}>
+                      <Icon name="spark" size={16} />{" "}
+                      {tr("Generate code with AI")}
+                    </button>{" "}
                     <button
                       onClick={() =>
                         void window.openscratch
@@ -1370,7 +1408,7 @@ function App() {
                   </p>
                   <p className="muted">
                     {tr(
-                      "AI: provider extension contracts are available; chat UI is not part of this version.",
+                      "AI is optional. Configure your provider under Generate code with AI.",
                     )}
                   </p>
                 </>

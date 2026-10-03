@@ -861,3 +861,45 @@ button:active:not(:disabled) .ui-icon {
     transform: none;
   }
 }
+
+.ai-modal {
+  width: min(1000px, 94vw);
+}
+.ai-panel fieldset {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.ai-panel label {
+  display: block;
+  font-size: 12px;
+  margin: 14px 0;
+}
+.ai-panel label > input:not([type="checkbox"]),
+.ai-panel textarea {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+}
+.ai-panel pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 180px;
+  overflow: auto;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 8px;
+}
+.ai-diff {
+  height: 330px;
+  border: 1px solid var(--line);
+}
+.editor-context-menu {
+  max-height: calc(100vh - 20px);
+  overflow-y: auto;
+}
+.editor-context-menu hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 4px;
+}

@@ -14,7 +14,7 @@ Choose **Preferences → Theme** for dark or light mode. Both include matching M
 
 Monaco provides line numbers, selection, undo/redo, and search. JavaScript and TypeScript also have completion, hover, diagnostics, and Prettier formatting. Python and C# currently offer text editing and syntax highlighting.
 
-Right-click the editor (or press Shift F10) for Format, Save snippet, Find, and Select all. The context menu follows the interface language. Formatting remains available only for JS/TS/JSX/TSX. Change All Occurrences is not included in this simplified menu; editor keyboard shortcuts remain available.
+Right-click the editor (or press Shift F10) for Cut, Copy, Paste, Format, Save snippet, Find, and Select all. Cut and Copy require a selection; Paste uses the system clipboard and supports undo. The context menu follows the interface language. Formatting remains available only for JS/TS/JSX/TSX. Change All Occurrences is not included in this simplified menu; editor keyboard shortcuts remain available.
 
 TypeScript type errors are reported separately from execution errors. A type error does not automatically block code that can be transpiled. C# must compile successfully before it can execute.
 
@@ -56,3 +56,7 @@ Choose **Preferences → Interface language → English / Español**. The prefer
 ## Environment variables
 
 Configure KEY=value entries in Tab settings. Node, Python, and C# receive these explicit variables. They are encrypted when OS secure storage is available; otherwise they are session-only. They are never automatically included in AI context, but your code can print them. Browser preview does not receive them.
+
+## AI code generation
+
+Open **Preferences → Generate code with AI** to use your own API base URL, model and key. Review the optional code context, generate, then accept or discard the diff. Applying disables Auto Run. See [AI setup and privacy](../ai-provider.md).

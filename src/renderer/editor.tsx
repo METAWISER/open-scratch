@@ -331,15 +331,16 @@ export function Editor({
           event.preventDefault();
           setMenu({
             x: Math.min(event.clientX, window.innerWidth - 245),
-            y: Math.min(event.clientY, window.innerHeight - 180),
+            y: Math.min(event.clientY, window.innerHeight - 310),
           });
         }}
-        onKeyDown={(event) => {
+        onKeyDownCapture={(event) => {
           if (
             (event.shiftKey && event.key === "F10") ||
             event.key === "ContextMenu"
           ) {
             event.preventDefault();
+            event.stopPropagation();
             const rect = host.current!.getBoundingClientRect();
             setMenu({ x: rect.left + 32, y: rect.top + 32 });
           }
@@ -376,6 +377,29 @@ export function Editor({
             ]?.focus();
           }}
         >
+          {(["cut", "copy", "paste"] as const).map((action) => (
+            <button
+              key={action}
+              role="menuitem"
+              disabled={
+                action !== "paste" &&
+                (!editor.current?.getSelection() ||
+                  editor.current?.getSelection()?.isEmpty())
+              }
+              onClick={() =>
+                act(() => {
+                  void window.openscratch.clipboard(action);
+                })
+              }
+            >
+              {tr({ cut: "Cut", copy: "Copy", paste: "Paste" }[action])}
+              <kbd>
+                {navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}{" "}
+                {{ cut: "X", copy: "C", paste: "V" }[action]}
+              </kbd>
+            </button>
+          ))}
+          <hr />
           <button
             role="menuitem"
             disabled={["py", "cs"].includes(tab.language)}

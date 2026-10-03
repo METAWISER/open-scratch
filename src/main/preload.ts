@@ -1,6 +1,20 @@
 import { contextBridge, ipcRenderer } from "electron";
 import type { Bridge, RunEvent } from "../shared/contracts";
 const api: Bridge = {
+  clipboard: (action) => ipcRenderer.invoke("clipboard", action),
+  aiStatus: () => ipcRenderer.invoke("ai:status"),
+  aiConfigure: (...args) => ipcRenderer.invoke("ai:configure", ...args),
+  aiForgetKey: () => ipcRenderer.invoke("ai:forget"),
+  aiGenerate: (request) => ipcRenderer.invoke("ai:generate", request),
+  aiCancel: (id) => ipcRenderer.invoke("ai:cancel", id),
+  onAIEvent: (listener) => {
+    const handler = (
+      _event: Electron.IpcRendererEvent,
+      value: import("../ai/wire").AIEvent,
+    ) => listener(value);
+    ipcRenderer.on("ai:event", handler);
+    return () => ipcRenderer.removeListener("ai:event", handler);
+  },
   openReference: (id) => ipcRenderer.invoke("reference:open", id),
   load: () => ipcRenderer.invoke("state:load"),
   save: (state) => ipcRenderer.invoke("state:save", state),
