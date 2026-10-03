@@ -1,3 +1,13 @@
+# Verification record — GitHub Releases workflow
+
+- The [manual release validation on GitHub Actions](https://github.com/METAWISER/open-scratch/actions/runs/37153840186) passed on Windows x64: frozen dependency installation, version/changelog validation, strict TypeScript, ESLint, Vitest, production build, dependency notices, packaging and **11 desktop scenarios against the packaged executable**.
+- The same tested application folder was wrapped in an unsigned NSIS installer. The installer, SHA-256 checksum and release notes were uploaded as workflow artifacts.
+- The publication job was intentionally skipped for this manual run. No version tag or public Release was created; tag-triggered GitHub Release creation remains unexercised.
+- Local release-note tests reject mismatched versions, missing notes and placeholder notes. Documentation build and both documentation browser scenarios passed, including the new Releases & downloads page; its GitHub Pages deployment succeeded.
+- Installer scope is Windows x64 only. This check does not verify installation through the NSIS wizard, signatures, automatic updates, or macOS/Linux installers.
+
+---
+
 # Verification record — OpenScratch 0.6 clipboard and AI generation
 
 - Windows x64: strict TypeScript, ESLint and production build pass. The full 52-test Vitest suite passed; the AI file then passed all five tests after adding fragmented UTF-8 and stale-generation coverage (53 distinct passing tests in total).
