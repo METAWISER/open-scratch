@@ -10,6 +10,8 @@ Host: Windows x64. Python tested through `py -3`: 3.14.7. Same Node/Electron too
 - `pnpm install --frozen-lockfile --offline`: pass.
 - Screenshots of the learning dialog and Python editor inspected visually.
 - Windows folder: `release/v0.2.0/win-unpacked/OpenScratch.exe`.
+- Unsigned Windows x64 NSIS installer: `release/v0.2.0/OpenScratch Setup 0.2.0.exe` (127836606 bytes). SHA256: `02AABC131DFE90BA41AB2A33DAE8FCCA06667940C95D3E516F09473491393826`.
+- Source uploaded to the user-designated repository METAWISER/open-scratch, branch main. GitHub CI was queued at handoff; only local results are claimed here.
 
 An initial packaging attempt overlapped a production build and omitted the UI entry file. It was discarded and rebuilt after the build completed; the regenerated package passed the complete desktop suite. The documented `pnpm package` script builds sequentially before packaging.
 
