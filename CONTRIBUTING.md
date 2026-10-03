@@ -28,6 +28,8 @@ No telemetry, mandatory cloud services, commercial quotas, or automatic code tra
 
 Original code and contributions are distributed under MIT. Write your own examples rather than copying tutorials. Keep third-party notices and run `pnpm run licenses` when dependencies change. No CLA is required; submitting a contribution means you agree to distribute it under MIT.
 
+For every change, review whether the application documentation and documentation website need updates; ship those updates in the same change. The website renders the guides in `docs/`, so update those sources and verify the website build. Follow [visual identity guidance](docs/branding.md) for icons and colors.
+
 ## Review and community
 
 METAWISER currently maintains the project and makes integration decisions. Keep PRs focused, pass CI, and obtain review before merging. Releases are not published automatically. Read [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) and [SECURITY.md](SECURITY.md).

@@ -1,3 +1,14 @@
+# Verification record — OpenScratch 0.5.1 visual identity
+
+- Windows x64: TypeScript, ESLint and desktop production build pass; all **48 unit/integration tests** pass.
+- **Nine desktop scenarios pass on the packaged 0.5.1 Windows executable**. Dark and light app screenshots were inspected separately with actual code execution and expanded results. No additional execution behavior was introduced.
+- Documentation production build and **two browser scenarios** pass, including navigation, search, copy, theme persistence and mobile overflow checks. Desktop/mobile captures were inspected; desktop-only menu visibility was corrected.
+- Six representative muted/accent text pairs measured 5.22:1–8.44:1 contrast. This is a focused palette check, not a full accessibility certification. Keyboard focus, accessible control labels and reduced-motion styles are retained.
+- Original vector mark rasterized into a 1024px PNG and six-size Windows ICO. No new dependencies or remote asset services. Native icon appearance on macOS/Linux and platform icon caches were not verified.
+- Local unsigned installer output: `release/v0.5.1/OpenScratch Setup 0.5.1.exe`. No installer-wizard execution, signing or release upload. Remote CI/deployment results are separate from local checks.
+
+---
+
 # Verification record — OpenScratch 0.5 RunJS audit improvements
 
 - Windows x64: strict TypeScript, ESLint and production build pass. Vitest: **48 tests passed**; the four new parity tests also passed after adding the Node CSS rejection assertion.

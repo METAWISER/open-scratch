@@ -1,6 +1,10 @@
 # OpenScratch
 
+<img src="assets/mark.svg" width="64" height="64" alt="OpenScratch code-and-spark mark" />
+
 A free, local desktop playground for JavaScript, TypeScript, JSX, TSX, Python and C#. Original MIT implementation inspired by the interaction patterns documented by RunJS. No account, telemetry, subscription, cloud service or execution quotas. TypeScript is included.
+
+The desktop app and documentation share an original violet, coral and mint identity, rounded SVG icons and matching light/dark themes. See [visual identity](docs/branding.md) for assets and contributor guidance.
 
 ## Develop and run
 

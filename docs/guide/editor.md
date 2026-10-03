@@ -4,6 +4,12 @@ The editor and results panel share a resizable split. Drag the separator or focu
 
 The left sidebar contains Run, Stop, Clear, Learn, Snippets, npm packages, and Preferences. Hover over an icon for its label. Preferences contains Auto Run, Auto Log, tab settings, documentation, contribution links, and access to the command palette. Formatting and saving snippets are available from the editor context menu or keyboard shortcuts.
 
+## Appearance
+
+OpenScratch uses a violet, coral and mint identity with rounded outline icons. The code-and-spark mark is shared by the desktop app, application icon and documentation website. Run has a softly colored background; Learn, Snippets and Packages have distinct accent colors and retain text tooltips and accessible labels.
+
+Choose **Preferences → Theme** for dark or light mode. Both include matching Monaco editor colors and readable result colors. The website has an independent theme button in its header. Interface transitions respect the operating system's reduced-motion preference. No online fonts or icon services are required.
+
 ## Editing
 
 Monaco provides line numbers, selection, undo/redo, and search. JavaScript and TypeScript also have completion, hover, diagnostics, and Prettier formatting. Python and C# currently offer text editing and syntax highlighting.

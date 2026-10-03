@@ -1,6 +1,6 @@
 {
   "name": "openscratch",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "private": true,
   "description": "A local open-source JavaScript, TypeScript, Python and C# playground",
   "author": "OpenScratch contributors",
@@ -19,6 +19,7 @@
     "package": "pnpm build && electron-builder --publish never",
     "package:dir": "pnpm build && electron-builder --dir --publish never",
     "licenses": "node scripts/licenses.mjs",
+    "icons": "node scripts/icon.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build",
     "docs:dev": "vite --config website/vite.config.ts",
     "docs:build": "vite build --config website/vite.config.ts",

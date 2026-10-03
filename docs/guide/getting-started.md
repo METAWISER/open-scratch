@@ -29,7 +29,7 @@ Open **Learn**, search for a method or an idea, and click an example. It opens i
 
 ## Make it yours
 
-Open **Preferences** using the gear button. Choose English or Spanish, light or dark appearance, font size, wrapping, and execution protections. Settings and tabs are saved locally.
+Open **Preferences** using the sliders button at the bottom of the sidebar. Choose English or Spanish, light or dark appearance, font size, wrapping, and execution protections. Settings and tabs are saved locally.
 
 Compiler messages, package logs, user output, and Monaco's built-in editor commands may retain their original language. Application controls, native menus, and learning explanations follow your preference.
 

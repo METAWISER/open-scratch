@@ -84,3 +84,7 @@ The documented RunJS environment combines DOM and Node globals. A compatible imp
 - Expand/collapse currently displayed objects and source-line hover highlight.
 - Browser stylesheet imports served within the existing isolated execution context.
 - Remaining work and priorities: [RunJS audit](runjs-audit.md). Combined runtime, shared environment UI, private npm registry configuration, layout customization and real AI chat remain unfinished.
+
+## Visual identity update (0.5.1)
+
+Original rounded SVG controls and a shared code-and-spark mark replace font-dependent toolbar symbols. Desktop, Monaco themes and documentation use coordinated violet/coral/mint accents, accessible labels, focus states and reduced-motion support. See [branding](branding.md) for assets and regeneration commands. No execution behavior or RunJS parity claim changes.

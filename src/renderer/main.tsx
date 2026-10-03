@@ -1,3 +1,4 @@
+import { Icon, BrandMark, type IconName } from "../shared/Icon";
 import { LocaleContext } from "./i18n";
 import { translate } from "../shared/i18n";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -36,12 +37,12 @@ function RailButton({
   icon,
   children,
   ...props
-}: React.ButtonHTMLAttributes<HTMLButtonElement> & { icon: string }) {
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { icon: IconName }) {
   const label =
     props["aria-label"] ?? (typeof children === "string" ? children : "");
   return (
     <button {...props} title={label} aria-label={label}>
-      <span aria-hidden="true">{icon}</span>
+      <Icon name={icon} />
       <span className="sr-only">{children}</span>
     </button>
   );
@@ -390,22 +391,22 @@ function App() {
       <main className="desktop-shell">
         <aside className="activity-bar" aria-label={tr("Workspace tools")}>
           <div className="rail-brand" title="OpenScratch">
-            ⌘
+            <BrandMark />
           </div>
           <div className="toolbar">
             <RailButton
-              icon="▶"
+              icon="play"
               className="primary"
               disabled={!loaded}
               onClick={() => void run()}
             >
               {tr("▶ Run")}
             </RailButton>
-            <RailButton icon="□" onClick={stop}>
+            <RailButton icon="stop" onClick={stop}>
               {tr("■ Stop")}
             </RailButton>
             <RailButton
-              icon="⌫"
+              icon="clear"
               onClick={() => {
                 pending.current = [];
                 setOutputs((s) => ({ ...s, [tab.id]: [] }));
@@ -416,7 +417,7 @@ function App() {
           </div>
           <nav>
             <RailButton
-              icon="?"
+              icon="learn"
               onClick={() => {
                 setHelpQuery("");
                 setModal("learn");
@@ -426,7 +427,7 @@ function App() {
             </RailButton>
 
             <RailButton
-              icon="▱"
+              icon="snippets"
               onClick={() => {
                 setQuery("");
                 setModal("snippets");
@@ -435,7 +436,7 @@ function App() {
               {tr("Snippets")}
             </RailButton>
             <RailButton
-              icon="⬡"
+              icon="package"
               onClick={() => {
                 setModal("packages");
                 void window.openscratch
@@ -448,7 +449,7 @@ function App() {
             </RailButton>
 
             <RailButton
-              icon="⚙"
+              icon="settings"
               aria-label={tr("Preferences")}
               onClick={() => setModal("preferences")}
             >
@@ -488,12 +489,12 @@ function App() {
                   });
                 }}
               >
-                ×
+                <Icon name="close" size={14} />
               </button>
             </div>
           ))}
           <button title={tr("New tab")} onClick={add}>
-            ＋
+            <Icon name="plus" />
           </button>
         </div>
         {error && (
@@ -586,7 +587,9 @@ function App() {
             <div className="console" data-testid="output">
               {!visibleOutputs.length && (
                 <div className="empty">
-                  <div className="empty-symbol">↳</div>
+                  <div className="empty-symbol">
+                    <Icon name="spark" size={40} />
+                  </div>
                   <h2>{tr("Room for a new idea.")}</h2>
                   <p>{tr("Run your code. Explore the result.")}</p>
                   <kbd>Ctrl / ⌘ R</kbd>
@@ -637,7 +640,7 @@ function App() {
                         .catch(fail)
                     }
                   >
-                    ⧉
+                    <Icon name="copy" size={16} />
                   </button>
                 </div>
               ))}
@@ -1466,7 +1469,10 @@ function App() {
                               void changePackage("install", name, "latest")
                             }
                           >
-                            {installed ? "✓" : "↓"}{" "}
+                            <Icon
+                              name={installed ? "check" : "download"}
+                              size={16}
+                            />{" "}
                             {tr(installed ? "Installed" : "Install")}
                           </button>
                         </div>

@@ -4,17 +4,17 @@
     Inter,
     Segoe UI,
     sans-serif;
-  color: #d8dce5;
-  background: #111318;
+  color: #eeeaf7;
+  background: #171522;
   font-synthesis: none;
-  --bg: #111318;
-  --panel: #171a21;
-  --raised: #20242e;
-  --line: #2a303c;
-  --muted: #828c9f;
-  --accent: #9fe8cc;
-  --ink: #d8dce5;
-  --editor: #1e1e1e;
+  --bg: #171522;
+  --panel: #201d2e;
+  --raised: #2d2840;
+  --line: #3b3450;
+  --muted: #afa6c2;
+  --accent: #c4adff;
+  --ink: #eeeaf7;
+  --editor: #191624;
   color-scheme: dark;
 }
 * {
@@ -34,7 +34,7 @@ button {
   background: none;
   color: inherit;
   padding: 7px 10px;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 12px;
   white-space: nowrap;
@@ -59,7 +59,7 @@ textarea {
   background: var(--bg);
   color: var(--ink);
   border: 1px solid var(--line);
-  border-radius: 5px;
+  border-radius: 8px;
   padding: 9px;
   min-width: 0;
 }
@@ -156,12 +156,12 @@ nav {
 }
 .primary {
   background: var(--accent);
-  color: #14291f;
+  color: #251747;
   font-weight: 650;
   padding: 7px 15px;
 }
 .primary:hover {
-  background: #b9f7dd;
+  background: #d8c8ff;
 }
 .spacer {
   flex: 1;
@@ -254,10 +254,10 @@ nav {
 .v-number,
 .v-bigint,
 .v-boolean {
-  color: #c3aeff;
+  color: #ffbf9f;
 }
 .v-string {
-  color: #9fe8cc;
+  color: #a1e8cc;
 }
 .v-undefined,
 .v-reference,
@@ -275,7 +275,7 @@ nav {
   align-items: baseline;
 }
 .property-name {
-  color: #9cbded;
+  color: #a8caff;
 }
 .property .value {
   display: inline-block;
@@ -315,7 +315,7 @@ kbd {
   margin-top: 12px;
   border: 1px solid var(--line);
   padding: 6px 9px;
-  border-radius: 5px;
+  border-radius: 8px;
 }
 .status-dot {
   display: inline-block;
@@ -494,22 +494,22 @@ h3 {
   margin-top: 5px;
 }
 [data-theme="light"] {
-  --bg: #f8f9fc;
+  --bg: #faf8ff;
   --panel: #fff;
-  --raised: #edf0f6;
-  --line: #dce1e9;
-  --muted: #68768d;
-  --accent: #237e60;
-  --ink: #263449;
+  --raised: #eee8fb;
+  --line: #ddd5ed;
+  --muted: #706480;
+  --accent: #6940bc;
+  --ink: #30253f;
   color: var(--ink);
   background: var(--bg);
   color-scheme: light;
 }
 [data-theme="light"] .v-string {
-  color: #237e60;
+  color: #6940bc;
 }
 [data-theme="light"] .v-number {
-  color: #7051a4;
+  color: #7139a8;
 }
 [data-theme="light"] .primary {
   color: white;
@@ -755,11 +755,109 @@ h3 {
   padding: 10px 0 20px;
 }
 .output-source-highlight {
-  background: #9fe8cc22;
+  background: #c4adff22;
   border-left: 2px solid var(--accent);
 }
 .output-actions {
   display: flex;
   justify-content: flex-end;
   border-bottom: 1px solid var(--line);
+}
+
+/* Radiant identity: expressive accents, quiet code surfaces. */
+.ui-icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.brand-mark {
+  display: block;
+}
+.rail-brand {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 10px;
+}
+.activity-bar button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  min-height: 40px;
+}
+.activity-bar .primary {
+  background: linear-gradient(135deg, #c4adff, #ffbfac);
+  color: #251747;
+  box-shadow: 0 3px 12px #ab82ff22;
+}
+.activity-bar .primary:hover {
+  background: linear-gradient(135deg, #d5c4ff, #ffd1bd);
+}
+.activity-bar nav button:nth-child(1) {
+  color: #ffd0ac;
+}
+.activity-bar nav button:nth-child(2) {
+  color: #c4adff;
+}
+.activity-bar nav button:nth-child(3) {
+  color: #a1e8cc;
+}
+.activity-bar nav button:last-child {
+  color: var(--muted);
+}
+button {
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+button:active:not(:disabled) .ui-icon {
+  transform: translateY(1px);
+}
+.copy:focus-visible,
+.output-row:focus-within .copy {
+  opacity: 1;
+}
+.tab.active {
+  border-top-color: #c4adff;
+}
+.empty-symbol {
+  display: inline-flex;
+  padding: 18px;
+  border-radius: 24px;
+  background: #c4adff12;
+  opacity: 1;
+}
+.modal {
+  border-radius: 18px;
+}
+[data-theme="light"] .activity-bar nav button:nth-child(1) {
+  color: #98501b;
+}
+[data-theme="light"] .activity-bar nav button:nth-child(2) {
+  color: #6940bc;
+}
+[data-theme="light"] .activity-bar nav button:nth-child(3) {
+  color: #21765e;
+}
+[data-theme="light"] .v-string {
+  color: #21765e;
+}
+[data-theme="light"] .v-bigint,
+[data-theme="light"] .v-boolean {
+  color: #7139a8;
+}
+[data-theme="light"] .property-name {
+  color: #315eab;
+}
+[data-theme="light"] .level-error {
+  color: #a52b45;
+}
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+  button:active:not(:disabled) .ui-icon {
+    transform: none;
+  }
 }

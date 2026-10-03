@@ -1,3 +1,5 @@
+import { version } from "../package.json";
+import { Icon, BrandMark } from "../src/shared/Icon";
 import { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Marked, Renderer } from "marked";
@@ -112,7 +114,7 @@ function App() {
       </a>
       <header className="topbar">
         <a className="brand" href="?page=start">
-          <span className="mark">⌘</span>
+          <BrandMark />
           <strong>OpenScratch</strong>
           <span className="docs-label">/ docs</span>
         </a>
@@ -124,7 +126,7 @@ function App() {
             aria-label="Toggle color theme"
             onClick={() => setDark(!dark)}
           >
-            {dark ? "☀" : "◐"}
+            <Icon name={dark ? "sun" : "moon"} />
           </button>
           <button
             className="menu-button"
@@ -139,7 +141,7 @@ function App() {
       <div className="layout">
         <aside id="navigation" className={`sidebar ${menu ? "is-open" : ""}`}>
           <div className="search">
-            <span>⌕</span>
+            <Icon name="search" size={18} />
             <input
               aria-label="Search documentation"
               placeholder="Search the docs…"
@@ -257,7 +259,7 @@ function App() {
             </section>
           )}
           <div className="page-meta">
-            <span>OpenScratch 0.3 · MIT licensed</span>
+            <span>OpenScratch {version} · MIT licensed</span>
             {page && (
               <a
                 href={`${repo}/edit/main/${page.source}`}

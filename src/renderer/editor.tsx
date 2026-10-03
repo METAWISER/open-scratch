@@ -11,6 +11,46 @@ globalThis.MonacoEnvironment = {
       ? new TSWorker()
       : new EditorWorker(),
 };
+monaco.editor.defineTheme("openscratch-dark", {
+  base: "vs-dark",
+  inherit: true,
+  rules: [
+    { token: "comment", foreground: "A69CB9" },
+    { token: "string", foreground: "A1E8CC" },
+    { token: "number", foreground: "FFBF9F" },
+    { token: "keyword", foreground: "C4ADFF" },
+  ],
+  colors: {
+    "editor.background": "#191624",
+    "editor.foreground": "#EEEAF7",
+    "editorLineNumber.foreground": "#968AA9",
+    "editorLineNumber.activeForeground": "#D8C8FF",
+    "editorCursor.foreground": "#C4ADFF",
+    "editor.selectionBackground": "#59407C80",
+    "editor.lineHighlightBackground": "#242031",
+    "editorGutter.background": "#191624",
+  },
+});
+monaco.editor.defineTheme("openscratch-light", {
+  base: "vs",
+  inherit: true,
+  rules: [
+    { token: "comment", foreground: "776A86" },
+    { token: "string", foreground: "21765E" },
+    { token: "number", foreground: "98471F" },
+    { token: "keyword", foreground: "6940BC" },
+  ],
+  colors: {
+    "editor.background": "#FDFBFF",
+    "editor.foreground": "#30253F",
+    "editorLineNumber.foreground": "#82748F",
+    "editorLineNumber.activeForeground": "#6940BC",
+    "editorCursor.foreground": "#6940BC",
+    "editor.selectionBackground": "#D8C5FF99",
+    "editor.lineHighlightBackground": "#F2EDF9",
+    "editorGutter.background": "#FDFBFF",
+  },
+});
 let libraries: IDisposable[] = [];
 let runtime: Tab["runtime"] = "node";
 export async function refreshTypes() {
@@ -163,7 +203,9 @@ export function Editor({
       runtime = tab.runtime;
       void refreshTypes().catch(() => {});
     }
-    monaco.editor.setTheme(settings.theme === "dark" ? "vs-dark" : "vs");
+    monaco.editor.setTheme(
+      settings.theme === "dark" ? "openscratch-dark" : "openscratch-light",
+    );
     editor.current?.updateOptions({
       fontSize: settings.fontSize,
       lineNumbers: settings.lineNumbers ? "on" : "off",

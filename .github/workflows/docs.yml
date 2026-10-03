@@ -7,6 +7,8 @@ on:
         "website/**",
         "docs/**",
         "src/learning/**",
+        "src/shared/Icon.tsx",
+        "assets/mark.svg",
         "CONTRIBUTING.md",
         "package.json",
         "pnpm-lock.yaml",
