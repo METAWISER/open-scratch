@@ -9,6 +9,7 @@ Host: Windows x64. Python 3.14.7 through `py -3`, .NET SDK 8.0.204, Node 24.19.0
 - Documentation production build passes and includes MIT and third-party notices.
 - `pnpm install --frozen-lockfile --offline`: pass using the populated local cache. License generator records 587 dependency notices.
 - Windows application folder: `release/v0.3.0/win-unpacked/OpenScratch.exe`.
+- Unsigned Windows x64 NSIS installer: `release/v0.3.0/OpenScratch Setup 0.3.0.exe` (127851688 bytes). SHA256: `A06BC2EEEA77D978CFBCBB8439AC66E0018C307297713A9E31C9DA74D60587F0`.
 
 Python and C# require separately installed runtimes. Their editor support is basic syntax highlighting, without semantic language servers or integrated package managers. C# uses explicit console output rather than Auto Log. Monaco's built-in menus remain English; OpenScratch controls and native menus support English and Spanish. Compiler diagnostics and user output are preserved in their original language. Website documentation is English. No installer wizard, macOS/Linux application or signing check was performed locally, and no release was uploaded.
 
