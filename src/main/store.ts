@@ -60,7 +60,24 @@ export class StateStore {
           JSON.stringify(data, null, 2),
           "utf8",
         );
-        await rename(`${this.file}.tmp`, this.file);
+        // Windows readers and antivirus scanners can briefly deny replacement.
+        // Keep the original intact and retain queue ordering while retrying.
+        for (let attempt = 0; ; attempt++) {
+          try {
+            await rename(`${this.file}.tmp`, this.file);
+            break;
+          } catch (error) {
+            const code = (error as NodeJS.ErrnoException).code;
+            if (
+              attempt >= 8 ||
+              !["EPERM", "EACCES", "EBUSY"].includes(code ?? "")
+            )
+              throw error;
+            await new Promise((resolve) =>
+              setTimeout(resolve, Math.min(25 * 2 ** attempt, 200)),
+            );
+          }
+        }
       });
     return this.queue;
   }
