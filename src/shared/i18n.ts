@@ -1,5 +1,31 @@
 export type Locale = "en" | "es";
 export const spanish: Record<string, string> = {
+  "Saved snippet": "Fragmento guardado",
+  "New snippet": "Nuevo fragmento",
+  Description: "Descripción",
+  Code: "Código",
+  "Insert at cursor": "Insertar en el cursor",
+  "Import library": "Importar biblioteca",
+  "Export library": "Exportar biblioteca",
+  "Edit snippet code": "Editar código del fragmento",
+  "Expand all": "Expandir todo",
+  "Collapse all": "Contraer todo",
+  "Editor and output": "Editor y resultados",
+  "Line numbers": "Números de línea",
+  "Font ligatures": "Ligaduras tipográficas",
+  "Close brackets": "Cerrar corchetes",
+  "Show whitespace": "Mostrar espacios",
+  "Highlight active line": "Resaltar línea activa",
+  Autocomplete: "Autocompletado",
+  "Type diagnostics": "Diagnósticos de tipos",
+  "Hover information": "Información al pasar el cursor",
+  "Signature help": "Ayuda de parámetros",
+  "Show undefined results": "Mostrar resultados undefined",
+  "The library supports up to 1000 snippets.":
+    "La biblioteca admite hasta 1000 fragmentos.",
+  "Save selected code or the whole tab. Insert reusable code at the cursor or open a new tab. Exports contain code and descriptions, never environment variables.":
+    "Guarda la selección o la pestaña completa. Inserta código en el cursor o abre otra pestaña. Se exportan código y descripciones, nunca variables de entorno.",
+
   "Workspace tools": "Herramientas",
   "Choose a language": "Elige un lenguaje",
   "Popular packages": "Paquetes populares",

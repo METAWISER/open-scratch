@@ -10,6 +10,7 @@ export const limitsSchema = z.object({
 export const tabSchema = z.object({
   id: z.string().min(1).max(100),
   name: z.string().max(200),
+  description: z.string().max(2000).default(""),
   code: z.string().max(2_000_000),
   language: languageSchema,
   runtime: z.enum(["node", "browser", "python", "dotnet"]),
@@ -24,6 +25,17 @@ export const tabSchema = z.object({
 });
 export const settingsSchema = z.object({
   locale: z.enum(["en", "es"]).default("en"),
+  lineNumbers: z.boolean().default(true),
+  fontLigatures: z.boolean().default(true),
+  closeBrackets: z.boolean().default(true),
+  renderWhitespace: z.boolean().default(false),
+  highlightActiveLine: z.boolean().default(true),
+  autocomplete: z.boolean().default(true),
+  linting: z.boolean().default(true),
+  hoverInfo: z.boolean().default(true),
+  signatureHelp: z.boolean().default(true),
+  showUndefined: z.boolean().default(true),
+
   theme: z.enum(["dark", "light"]),
   autoRun: z.boolean(),
   autoLog: z.boolean(),
@@ -91,6 +103,8 @@ export interface Bridge {
     language: Tab["language"],
     options: Pick<Settings, "semi" | "singleQuote" | "tabSize">,
   ): Promise<string>;
+  importSnippets(): Promise<Tab[] | null>;
+  exportSnippets(snippets: Tab[]): Promise<void>;
   importFile(): Promise<{
     name: string;
     code: string;
@@ -115,6 +129,17 @@ export interface Bridge {
 }
 export const defaultSettings: Settings = {
   locale: "en",
+  lineNumbers: true,
+  fontLigatures: true,
+  closeBrackets: true,
+  renderWhitespace: false,
+  highlightActiveLine: true,
+  autocomplete: true,
+  linting: true,
+  hoverInfo: true,
+  signatureHelp: true,
+  showUndefined: true,
+
   theme: "dark",
   autoRun: false,
   autoLog: true,
@@ -130,6 +155,7 @@ export function newTab(id: string, name = "Untitled"): Tab {
   return {
     id,
     name,
+    description: "",
     code: "",
     language: "ts",
     runtime: "node",

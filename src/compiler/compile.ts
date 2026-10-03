@@ -3,10 +3,10 @@ import { join } from "node:path";
 import { createRequire } from "node:module";
 import type { RunRequest } from "../shared/contracts";
 import { instrument } from "./instrument";
-export async function compile(
+export async function compileBundle(
   request: RunRequest,
   workspace: string,
-): Promise<string> {
+): Promise<{ code: string; css: string }> {
   const localRequire = createRequire(import.meta.url);
   const esbuildPackage = localRequire.resolve("esbuild/package.json");
   if (esbuildPackage.includes("app.asar")) {
@@ -20,7 +20,7 @@ export async function compile(
   const { build } = await import("esbuild");
   const { tab } = request;
   if (tab.language === "py" || tab.language === "cs")
-    throw new Error("Python requires the Python runtime.");
+    throw new Error("Python and C# require their dedicated runtimes.");
   const hook = `__os_${randomUUID().replaceAll("-", "")}`;
   const filename = `scratch.${tab.language}`;
   const code = instrument(tab.code, filename, {
@@ -41,6 +41,20 @@ export async function compile(
     },
     bundle: true,
     write: false,
+    outfile: "entry.js",
+    loader: node
+      ? undefined
+      : {
+          ".png": "dataurl",
+          ".jpg": "dataurl",
+          ".jpeg": "dataurl",
+          ".gif": "dataurl",
+          ".svg": "dataurl",
+          ".webp": "dataurl",
+          ".woff": "dataurl",
+          ".woff2": "dataurl",
+          ".ttf": "dataurl",
+        },
     format: "esm",
     platform: node ? "node" : "browser",
     target: node ? "node22" : "chrome130",
@@ -57,6 +71,9 @@ export async function compile(
           {
             name: "native-dependencies",
             setup(b) {
+              b.onLoad({ filter: /\.css$/ }, () => ({
+                errors: [{ text: "CSS imports require the Browser runtime" }],
+              }));
               b.onResolve({ filter: /^[^./]|^@/ }, (args) => {
                 if (args.path.startsWith("node:"))
                   return { path: args.path, external: true };
@@ -82,5 +99,16 @@ export async function compile(
         ]
       : [],
   });
-  return result.outputFiles[0].text;
+  return {
+    code: result.outputFiles.find((file) => file.path.endsWith(".js"))!.text,
+    css:
+      result.outputFiles.find((file) => file.path.endsWith(".css"))?.text ?? "",
+  };
+}
+
+export async function compile(
+  request: RunRequest,
+  workspace: string,
+): Promise<string> {
+  return (await compileBundle(request, workspace)).code;
 }

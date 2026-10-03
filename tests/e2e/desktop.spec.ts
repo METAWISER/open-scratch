@@ -459,3 +459,169 @@ test("sidebar, language picker, editor actions and popular package installation"
   await page.screenshot({ path: "test-results/sidebar-final.png" });
   await page.evaluate(() => window.openscratch.packages("remove", "date-fns"));
 });
+
+test("reusable snippets, editor preferences and output inspection", async () => {
+  await page.getByTitle("New tab", { exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "JavaScript Node.js", exact: true })
+    .click();
+  await code("// keep outside selection\nconst reusable = 42;");
+  await page.locator(".monaco-editor textarea").first().focus();
+  await page.keyboard.press("ControlOrMeta+End");
+  await page.keyboard.press("Home");
+  await page.keyboard.press("Shift+End");
+  await page.keyboard.press("ControlOrMeta+s");
+  await expect
+    .poll(async () =>
+      (await page.evaluate(() => window.openscratch.load())).snippets.some(
+        (s) => s.code === "const reusable = 42;",
+      ),
+    )
+    .toBe(true);
+  await page.getByRole("button", { name: "Snippets", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByLabel("Search snippets")
+    .fill("const reusable");
+  await page
+    .getByRole("dialog")
+    .getByRole("textbox", { name: /^Rename / })
+    .fill("reuseAnswer");
+  await page
+    .getByRole("dialog")
+    .getByRole("textbox", { name: "Description reuseAnswer", exact: true })
+    .fill("Reusable answer helper");
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "✕", exact: true })
+    .click();
+  await code("reuseAns");
+  await page.keyboard.press("ControlOrMeta+Space");
+  await expect(page.locator(".suggest-widget")).toContainText("reuseAnswer");
+  await page.keyboard.press("Escape");
+  await code("// inserted below\n");
+  await page.getByRole("button", { name: "Snippets", exact: true }).click();
+  await page
+    .getByRole("dialog")
+    .getByLabel("Search snippets")
+    .fill("reuseAnswer");
+  await page
+    .getByRole("button", { name: "Insert at cursor", exact: true })
+    .click();
+  await expect
+    .poll(async () => {
+      const s = await page.evaluate(() => window.openscratch.load());
+      return s.tabs
+        .find((t) => t.id === s.active)!
+        .code.replaceAll("\r\n", "\n");
+    })
+    .toBe("// inserted below\nconst reusable = 42;");
+  await page.getByRole("button", { name: "Preferences", exact: true }).click();
+  await page.getByText("Editor and output", { exact: true }).click();
+  await page.getByLabel("Show undefined results", { exact: true }).uncheck();
+  await page.getByLabel("Line numbers", { exact: true }).uncheck();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "✕", exact: true })
+    .click();
+  await code("undefined;\n({ nested: { answer: 42 } });");
+  await page.getByRole("button", { name: "▶ Run", exact: true }).click();
+  await expect(page.locator(".output-row")).toHaveCount(1);
+  await page.getByRole("button", { name: "Expand all", exact: true }).click();
+  await expect
+    .poll(() => page.locator(".console details:not([open])").count())
+    .toBe(0);
+  await expect(
+    page.locator(".console .property-name").filter({ hasText: "answer" }),
+  ).toBeVisible();
+  await page.locator(".output-row").hover();
+  await expect(page.locator(".output-source-highlight")).toBeVisible();
+  await page.getByRole("button", { name: "Collapse all", exact: true }).click();
+  await expect(page.locator(".console details[open]")).toHaveCount(0);
+  await page.getByRole("button", { name: "Preferences", exact: true }).click();
+  await page.getByText("Editor and output", { exact: true }).click();
+  await expect(
+    page.getByLabel("Line numbers", { exact: true }),
+  ).not.toBeChecked();
+  await page.getByLabel("Line numbers", { exact: true }).check();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "✕", exact: true })
+    .click();
+  const exportPath = join(directory, "library.json");
+  await app.evaluate(({ dialog }, filePath) => {
+    dialog.showSaveDialog = async () => ({ canceled: false, filePath });
+    dialog.showOpenDialog = async () => ({
+      canceled: false,
+      filePaths: [filePath],
+    });
+  }, exportPath);
+  await page.getByRole("button", { name: "Snippets", exact: true }).click();
+  await page
+    .getByRole("button", { name: "Export library", exact: true })
+    .click();
+  await expect
+    .poll(async () => {
+      try {
+        return JSON.parse(await readFile(exportPath, "utf8")).format;
+      } catch {
+        return "";
+      }
+    })
+    .toBe("openscratch-snippets");
+  const exported = JSON.parse(await readFile(exportPath, "utf8"));
+  expect(
+    exported.snippets.some(
+      (snippet: { description: string }) =>
+        snippet.description === "Reusable answer helper",
+    ),
+  ).toBe(true);
+  const before = (await page.evaluate(() => window.openscratch.load())).snippets
+    .length;
+  await page
+    .getByRole("button", { name: "Import library", exact: true })
+    .click();
+  await expect
+    .poll(
+      async () =>
+        (await page.evaluate(() => window.openscratch.load())).snippets.length,
+    )
+    .toBe(before + exported.snippets.length);
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "✕", exact: true })
+    .click();
+  await page.screenshot({ path: "test-results/parity-output.png" });
+});
+
+test("Browser loads local stylesheets and keeps source locations and bridge isolation", async () => {
+  await writeFile(
+    join(directory, "colors.css"),
+    "#root { color: rgb(12, 34, 56); }",
+  );
+  await writeFile(
+    join(directory, "styles.css"),
+    '@import "./colors.css"; #root { font-size: 23px; }',
+  );
+  await page.getByRole("button", { name: "Preferences", exact: true }).click();
+  await page.getByRole("button", { name: "Tab settings", exact: true }).click();
+  await page.getByLabel("Working directory", { exact: true }).fill(directory);
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "✕", exact: true })
+    .click();
+  await page.getByLabel("Runtime", { exact: true }).selectOption("browser");
+  await code(
+    'import "./styles.css";\nconsole.log(getComputedStyle(document.getElementById("root")).color);\nconsole.log(typeof window.openscratch);',
+  );
+  await page.getByRole("button", { name: "▶ Run", exact: true }).click();
+  await expect(page.getByTestId("output")).toContainText("rgb(12, 34, 56)");
+  await expect(page.getByTestId("output")).toContainText("undefined");
+  await expect(
+    page
+      .locator(".output-row")
+      .filter({ hasText: "rgb(12, 34, 56)" })
+      .locator(".source-line"),
+  ).toHaveText("2");
+});

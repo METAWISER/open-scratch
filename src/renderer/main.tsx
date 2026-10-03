@@ -54,6 +54,7 @@ function App() {
     [outputs, setOutputs] = useState<Record<string, Output[]>>({}),
     [status, setStatus] = useState("idle"),
     [diagnostics, setDiagnostics] = useState(0),
+    [hoveredLine, setHoveredLine] = useState<number | undefined>(),
     [helpQuery, setHelpQuery] = useState(""),
     [query, setQuery] = useState(""),
     [packages, setPackages] = useState<PackageInfo[]>([]),
@@ -219,11 +220,41 @@ function App() {
     setModal(null);
     setState((s) => ({ ...s, tabs: [...s.tabs, t], active: t.id }));
   };
-  const saveSnippet = () =>
+  const saveSnippet = useCallback(() => {
+    const state = current.current;
+    const tab = state.tabs.find((t) => t.id === state.active)!;
+    const selection = editor.current?.getSelection();
+    const selected =
+      selection && !selection.isEmpty()
+        ? editor.current?.getModel()?.getValueInRange(selection)
+        : undefined;
+    const snippet = {
+      ...tab,
+      id: selected ? crypto.randomUUID() : tab.id,
+      code: selected ?? tab.code,
+      env: {},
+      cwd: "",
+      logpoints: [],
+      pythonExecutable: "",
+      dotnetExecutable: "",
+    };
+    if (
+      state.snippets.length >= 1000 &&
+      !state.snippets.some((saved) => saved.id === snippet.id)
+    ) {
+      setError(
+        translate(
+          state.settings.locale,
+          "The library supports up to 1000 snippets.",
+        ),
+      );
+      return;
+    }
     setState((s) => ({
       ...s,
-      snippets: [...s.snippets.filter((t) => t.id !== tab.id), { ...tab }],
+      snippets: [...s.snippets.filter((t) => t.id !== snippet.id), snippet],
     }));
+  }, []);
   const importFile = async () => {
     try {
       const data = await window.openscratch.importFile();
@@ -259,12 +290,7 @@ function App() {
       }
       if (e.key === "s") {
         e.preventDefault();
-        const s = current.current,
-          t = s.tabs.find((t) => t.id === s.active)!;
-        setState((s) => ({
-          ...s,
-          snippets: [...s.snippets.filter((x) => x.id !== t.id), t],
-        }));
+        saveSnippet();
       }
       if (e.key === "f" && e.shiftKey) {
         e.preventDefault();
@@ -273,7 +299,7 @@ function App() {
     };
     window.addEventListener("keydown", key);
     return () => window.removeEventListener("keydown", key);
-  }, [run, stop, format]);
+  }, [run, stop, format, saveSnippet]);
   useEffect(() => {
     const element = preview.current;
     if (!element) return;
@@ -347,6 +373,18 @@ function App() {
       setBusy(false);
     }
   };
+  const visibleOutputs = (outputs[tab.id] ?? []).filter(
+    (o) =>
+      state.settings.showUndefined ||
+      o.level !== "result" ||
+      o.values.some((v) => v.type !== "undefined"),
+  );
+  const expandOutput = (open: boolean) =>
+    document
+      .querySelectorAll<HTMLDetailsElement>(".console details")
+      .forEach((d) => {
+        d.open = open;
+      });
   return (
     <LocaleContext.Provider value={state.settings.locale}>
       <main className="desktop-shell">
@@ -479,6 +517,8 @@ function App() {
             </div>
             <Editor
               tab={tab}
+              snippets={state.snippets}
+              hoveredLine={hoveredLine}
               settings={state.settings}
               onChange={codeChanged}
               onFormat={() => void format()}
@@ -535,8 +575,16 @@ function App() {
                 <span className={`status-dot ${status}`} />
               </span>
             </div>
+            <div className="output-actions">
+              <button onClick={() => expandOutput(true)}>
+                {tr("Expand all")}
+              </button>
+              <button onClick={() => expandOutput(false)}>
+                {tr("Collapse all")}
+              </button>
+            </div>
             <div className="console" data-testid="output">
-              {!outputs[tab.id]?.length && (
+              {!visibleOutputs.length && (
                 <div className="empty">
                   <div className="empty-symbol">↳</div>
                   <h2>{tr("Room for a new idea.")}</h2>
@@ -544,8 +592,13 @@ function App() {
                   <kbd>Ctrl / ⌘ R</kbd>
                 </div>
               )}
-              {outputs[tab.id]?.map((o, i) => (
-                <div className={`output-row level-${o.level}`} key={i}>
+              {visibleOutputs.map((o, i) => (
+                <div
+                  className={`output-row level-${o.level}`}
+                  key={i}
+                  onMouseEnter={() => setHoveredLine(o.line)}
+                  onMouseLeave={() => setHoveredLine(undefined)}
+                >
                   <button
                     className="source-line"
                     title={tr("Jump to source")}
@@ -766,6 +819,24 @@ function App() {
               {modal === "snippets" && (
                 <SnippetLibrary
                   snippets={state.snippets}
+                  language={tab.language}
+                  onInsert={(snippet) => {
+                    const instance = editor.current,
+                      selection = instance?.getSelection();
+                    if (instance && selection) {
+                      instance.pushUndoStop();
+                      instance.executeEdits("insert-snippet", [
+                        {
+                          range: selection,
+                          text: snippet.code,
+                          forceMoveMarkers: true,
+                        },
+                      ]);
+                      instance.pushUndoStop();
+                    }
+                    setModal(null);
+                    instance?.focus();
+                  }}
                   onChange={(snippets) => setState((s) => ({ ...s, snippets }))}
                   onOpen={(t) => {
                     stop();
@@ -1075,6 +1146,171 @@ function App() {
                       ),
                     )}
                   </div>
+                  <details className="editor-preferences">
+                    <summary>{tr("Editor and output")}</summary>
+                    <div className="preference-toggles">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={state.settings.lineNumbers}
+                          onChange={(e) =>
+                            setState((s) => ({
+                              ...s,
+                              settings: {
+                                ...s.settings,
+                                lineNumbers: e.target.checked,
+                              },
+                            }))
+                          }
+                        />
+                        {tr("Line numbers")}
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={state.settings.fontLigatures}
+                          onChange={(e) =>
+                            setState((s) => ({
+                              ...s,
+                              settings: {
+                                ...s.settings,
+                                fontLigatures: e.target.checked,
+                              },
+                            }))
+                          }
+                        />
+                        {tr("Font ligatures")}
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={state.settings.closeBrackets}
+                          onChange={(e) =>
+                            setState((s) => ({
+                              ...s,
+                              settings: {
+                                ...s.settings,
+                                closeBrackets: e.target.checked,
+                              },
+                            }))
+                          }
+                        />
+                        {tr("Close brackets")}
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={state.settings.renderWhitespace}
+                          onChange={(e) =>
+                            setState((s) => ({
+                              ...s,
+                              settings: {
+                                ...s.settings,
+                                renderWhitespace: e.target.checked,
+                              },
+                            }))
+                          }
+                        />
+                        {tr("Show whitespace")}
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={state.settings.highlightActiveLine}
+                          onChange={(e) =>
+                            setState((s) => ({
+                              ...s,
+                              settings: {
+                                ...s.settings,
+                                highlightActiveLine: e.target.checked,
+                              },
+                            }))
+                          }
+                        />
+                        {tr("Highlight active line")}
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={state.settings.autocomplete}
+                          onChange={(e) =>
+                            setState((s) => ({
+                              ...s,
+                              settings: {
+                                ...s.settings,
+                                autocomplete: e.target.checked,
+                              },
+                            }))
+                          }
+                        />
+                        {tr("Autocomplete")}
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={state.settings.linting}
+                          onChange={(e) =>
+                            setState((s) => ({
+                              ...s,
+                              settings: {
+                                ...s.settings,
+                                linting: e.target.checked,
+                              },
+                            }))
+                          }
+                        />
+                        {tr("Type diagnostics")}
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={state.settings.hoverInfo}
+                          onChange={(e) =>
+                            setState((s) => ({
+                              ...s,
+                              settings: {
+                                ...s.settings,
+                                hoverInfo: e.target.checked,
+                              },
+                            }))
+                          }
+                        />
+                        {tr("Hover information")}
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={state.settings.signatureHelp}
+                          onChange={(e) =>
+                            setState((s) => ({
+                              ...s,
+                              settings: {
+                                ...s.settings,
+                                signatureHelp: e.target.checked,
+                              },
+                            }))
+                          }
+                        />
+                        {tr("Signature help")}
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={state.settings.showUndefined}
+                          onChange={(e) =>
+                            setState((s) => ({
+                              ...s,
+                              settings: {
+                                ...s.settings,
+                                showUndefined: e.target.checked,
+                              },
+                            }))
+                          }
+                        />
+                        {tr("Show undefined results")}
+                      </label>
+                    </div>
+                  </details>
                   <h3>{tr("Execution protections")}</h3>
                   <div className="settings-grid">
                     {(

@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { SourceMap } from "node:module";
 import type { RunRequest, RunEvent } from "../shared/contracts";
-import { compile } from "../compiler/compile";
+import { compileBundle } from "../compiler/compile";
 export class BrowserRunner {
   view?: WebContentsView;
   private generation = 0;
@@ -49,7 +49,7 @@ export class BrowserRunner {
     this.runId = request.runId;
     this.emit({ kind: "status", runId: request.runId, status: "running" });
     try {
-      const code = await compile(request, this.workspace);
+      const { code, css } = await compileBundle(request, this.workspace);
       const bootstrap = await readFile(
         join(this.dist, "browser-bootstrap.js"),
         "utf8",
@@ -98,11 +98,13 @@ export class BrowserRunner {
       this.owner.contentView.addChildView(view);
       this.setBounds(this.bounds);
       const escape = (s: string) => s.replaceAll("</script", "<\\/script");
-      const html = `<!doctype html><meta charset="utf-8"><div id="root"></div><script>window.__runConfig=${JSON.stringify({ runId: request.runId, ...request.limits })}</script><script>${escape(bootstrap)}</script><script type="module" src="./entry.js"></script>`;
+      const html = `<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="./styles.css"><div id="root"></div><script>window.__runConfig=${JSON.stringify({ runId: request.runId, ...request.limits })}</script><script>${escape(bootstrap)}</script><script type="module" src="./entry.js"></script>`;
       ses.protocol.handle("scratch", (req) => {
         const url = new URL(req.url);
         if (url.host !== request.runId)
           return new Response("Not found", { status: 404 });
+        if (url.pathname === "/styles.css")
+          return new Response(css, { headers: { "content-type": "text/css" } });
         if (url.pathname === "/entry.js")
           return new Response(code + "\n//# sourceURL=openscratch-user.js\n", {
             headers: { "content-type": "text/javascript" },

@@ -1,3 +1,14 @@
+# Verification record — OpenScratch 0.5 RunJS audit improvements
+
+- Windows x64: strict TypeScript, ESLint and production build pass. Vitest: **48 tests passed**; the four new parity tests also passed after adding the Node CSS rejection assertion.
+- **Nine desktop scenarios passed together against the packaged Windows executable**. New coverage includes selection-to-snippet capture, name/description editing, actual Monaco completion, cursor insertion, persisted preferences, undefined-result filtering, expand/collapse, source hover highlighting, JSON library export/import, Browser CSS and original console lines with bridge isolation.
+- Library transfer tests use the real IPC and filesystem, substituting only native dialog path selection. JSON exports omit runtime environment, executable paths and cwd. Import validation and legacy preference defaults have unit coverage.
+- The final snippet-capacity guard preserves existing entries instead of silently evicting them. The rebuilt package's two new parity scenarios were rechecked after this small final change.
+- Screenshot of output inspection reviewed. Existing Node/Browser/Python/C# execution, package installation/types, React preview, offline use and persistence remain covered by the desktop suite.
+- Documentation production build passed. Windows NSIS installer generated locally at `release/v0.5.0/OpenScratch Setup 0.5.0.exe`; executable at `release/v0.5.0/win-unpacked/OpenScratch.exe`. No 0.5 macOS/Linux execution, installer-wizard execution, signing or release upload is claimed. Remote CI results are separate from these local checks.
+
+---
+
 # Verification record — OpenScratch 0.4 desktop workflow
 
 - Windows production build, TypeScript and ESLint pass. The two localization/migration tests pass.

@@ -10,7 +10,14 @@ root.innerHTML = "<h1>Hello, OpenScratch</h1>";
 root.style.color = "#168967";
 ```
 
-Inject style elements for CSS. Direct CSS file imports and dedicated HTML/CSS editor panels are not supported yet. Browser + Node in the same realm is not implemented.
+Inject style elements for CSS, or set **Tab settings → Working directory** and import a local stylesheet:
+
+```js
+import './styles.css';
+document.getElementById('root').textContent = 'Styled locally';
+```
+
+Browser bundles CSS imports and nested `@import` rules. Local PNG/JPEG/GIF/SVG/WebP images and WOFF/WOFF2/TTF fonts referenced by `url()` are embedded as data URLs. Remote URLs retain ordinary browser networking behavior. Styles are served in the isolated execution context before the user module runs; reruns create a fresh context. Node CSS imports report an error. Sass/Less and dedicated HTML/CSS source panels are not implemented. Browser + Node in the same realm remains unimplemented.
 
 ## npm packages
 

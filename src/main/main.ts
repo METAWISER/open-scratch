@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+import { exportLibrary, importLibrary } from "../shared/snippets";
 import {
   app,
   BrowserWindow,
@@ -9,7 +11,7 @@ import {
   shell,
 } from "electron";
 import { join, extname, basename } from "node:path";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, stat } from "node:fs/promises";
 import { format } from "prettier";
 import { z } from "zod";
 import { StateStore } from "./store";
@@ -202,6 +204,26 @@ app
         singleQuote: settings.singleQuote,
         tabWidth: settings.tabSize,
       });
+    });
+    handle("snippets:import", async () => {
+      const result = await dialog.showOpenDialog(window, {
+        filters: [{ name: "OpenScratch snippets", extensions: ["json"] }],
+        properties: ["openFile"],
+      });
+      if (result.canceled) return null;
+      const file = result.filePaths[0];
+      if ((await stat(file)).size > 8_000_000)
+        throw new Error("Snippet library exceeds 8 MB");
+      return importLibrary(await readFile(file, "utf8"), randomUUID);
+    });
+    handle("snippets:export", async (payload) => {
+      const text = exportLibrary(z.array(tabSchema).max(1000).parse(payload));
+      const result = await dialog.showSaveDialog(window, {
+        defaultPath: "openscratch-snippets.json",
+        filters: [{ name: "JSON", extensions: ["json"] }],
+      });
+      if (!result.canceled && result.filePath)
+        await writeFile(result.filePath, text, "utf8");
     });
     handle("file:import", async () => {
       const result = await dialog.showOpenDialog(window, {

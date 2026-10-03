@@ -16,7 +16,13 @@ TypeScript type errors are reported separately from execution errors. A type err
 
 Use the plus button to choose JavaScript, TypeScript, JSX, TSX, Python, or C# before creating a blank tab. JSX/TSX start with Browser; other languages use Node, Python, or .NET as appropriate. The status-bar language selector remains available. **Tab settings** lets you rename, duplicate, import, and export files. Supported file extensions are .js, .ts, .jsx, .tsx, .py, and .cs.
 
-**Save snippet** stores a snapshot in the library. Open **Snippets** to search, rename, duplicate, delete, or open a saved copy. Code, tabs, snippets, and preferences autosave locally.
+**Save snippet** (or Ctrl/Cmd S) saves selected text, or the whole tab if the selection is empty. Selected fragments become separate library entries. Whole-tab snapshots update the existing entry for that tab. New snippets exclude runtime paths and environment variables.
+
+Open **Snippets** to create, search, rename, describe, edit, duplicate or delete reusable code. **Insert at cursor** replaces the current selection and supports undo; **Open** creates a new tab. Completion suggests saved snippets for the exact current language by name and includes their descriptions. Snippet bodies are literal code, not placeholder templates.
+
+**Export library** writes a versioned OpenScratch JSON file with names, descriptions, languages and code only. **Import library** validates that format and adds entries with new IDs; it never executes imported code. Limits are 8 MB per transfer and 1000 library entries. This format is not claimed to be compatible with RunJS exports. Code can itself contain secrets, so review it before sharing.
+
+Code, tabs, snippets, and preferences autosave locally.
 
 ## Keyboard shortcuts
 
@@ -30,6 +36,12 @@ Use the plus button to choose JavaScript, TypeScript, JSX, TSX, Python, or C# be
 | Find in editor        | Ctrl/Cmd F        |
 | Toggle JS/TS logpoint | F9                |
 | Clear JS/TS logpoints | Ctrl/Cmd Shift F9 |
+
+## Editor and output preferences
+
+Expand **Preferences → Editor and output** to configure line numbers, ligatures, bracket closing, whitespace, active-line highlighting, automatic suggestions, type diagnostics, hover and parameter help. Turning diagnostics off does not change whether code can execute. Manual completion remains available.
+
+**Show undefined results** filters undefined expression results from the display while preserving explicit console messages. Use **Expand all / Collapse all** above results for the currently displayed snapshots. Hover a result to highlight its original source line; click the source number to navigate.
 
 ## Interface language
 

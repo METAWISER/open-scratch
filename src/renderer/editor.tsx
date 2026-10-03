@@ -31,6 +31,8 @@ export async function refreshTypes() {
 export function Editor({
   tab,
   settings,
+  snippets,
+  hoveredLine,
   onChange,
   onFormat,
   onSaveSnippet,
@@ -40,6 +42,8 @@ export function Editor({
 }: {
   tab: Tab;
   settings: Settings;
+  snippets: Tab[];
+  hoveredLine?: number;
   onChange: (code: string) => void;
   onFormat: () => void;
   onSaveSnippet: () => void;
@@ -162,6 +166,16 @@ export function Editor({
     monaco.editor.setTheme(settings.theme === "dark" ? "vs-dark" : "vs");
     editor.current?.updateOptions({
       fontSize: settings.fontSize,
+      lineNumbers: settings.lineNumbers ? "on" : "off",
+      fontLigatures: settings.fontLigatures,
+      autoClosingBrackets: settings.closeBrackets ? "languageDefined" : "never",
+      renderWhitespace: settings.renderWhitespace ? "all" : "none",
+      renderLineHighlight: settings.highlightActiveLine ? "all" : "none",
+      quickSuggestions: settings.autocomplete,
+      suggestOnTriggerCharacters: settings.autocomplete,
+      hover: { enabled: settings.hoverInfo },
+      parameterHints: { enabled: settings.signatureHelp },
+      renderValidationDecorations: settings.linting ? "on" : "off",
       tabSize: settings.tabSize,
       wordWrap: settings.wordWrap ? "on" : "off",
     });
@@ -187,11 +201,64 @@ export function Editor({
             : ["esnext"],
       });
       defaults.setDiagnosticsOptions({
-        noSemanticValidation: false,
-        noSyntaxValidation: false,
+        noSemanticValidation: !settings.linting,
+        noSyntaxValidation: !settings.linting,
       });
     }
   }, [settings, tab.runtime]);
+  useEffect(() => {
+    const language =
+      tab.language === "cs"
+        ? "csharp"
+        : tab.language === "py"
+          ? "python"
+          : ["ts", "tsx"].includes(tab.language)
+            ? "typescript"
+            : "javascript";
+    const provider = monaco.languages.registerCompletionItemProvider(language, {
+      provideCompletionItems(model, position) {
+        if (model !== editor.current?.getModel()) return { suggestions: [] };
+        const word = model.getWordUntilPosition(position);
+        const range = new monaco.Range(
+          position.lineNumber,
+          word.startColumn,
+          position.lineNumber,
+          word.endColumn,
+        );
+        return {
+          suggestions: snippets
+            .filter((s) => s.language === tab.language && s.name.trim())
+            .map((s) => ({
+              label: s.name,
+              detail: tr("Saved snippet"),
+              documentation: s.description,
+              kind: monaco.languages.CompletionItemKind.Snippet,
+              insertText: s.code,
+              range,
+              sortText: "0-" + s.name,
+            })),
+        };
+      },
+    });
+    return () => provider.dispose();
+  }, [snippets, tab.language, settings.locale]);
+  useEffect(() => {
+    const model = editor.current?.getModel();
+    const decorations = editor.current?.createDecorationsCollection(
+      hoveredLine && model && hoveredLine <= model.getLineCount()
+        ? [
+            {
+              range: new monaco.Range(hoveredLine, 1, hoveredLine, 1),
+              options: {
+                isWholeLine: true,
+                className: "output-source-highlight",
+              },
+            },
+          ]
+        : [],
+    );
+    return () => decorations?.clear();
+  }, [hoveredLine, tab.id]);
   useEffect(() => {
     const decorations = editor.current?.createDecorationsCollection(
       tab.logpoints.map((line) => ({
