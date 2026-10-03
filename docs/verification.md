@@ -1,3 +1,13 @@
+# Verification record — OpenScratch 0.4 desktop workflow
+
+- Windows production build, TypeScript and ESLint pass. The two localization/migration tests pass.
+- All seven desktop scenarios were exercised on `release/v0.4.0/win-unpacked/OpenScratch.exe`: six existing scenarios passed together, then the new workflow scenario passed after allowing 30 seconds for the first installed-package execution. Its original five-second assertion was too short in this environment.
+- New coverage: all six language-picker choices and runtime defaults, context-menu formatting and snippet persistence, popular-package installation and immediate date-fns execution. Existing tests now access Auto Run/Auto Log through Preferences.
+- Final reduced-sidebar screenshot inspected. Windows NSIS installer generated locally, unsigned; no release upload or installer-wizard execution.
+- The documentation website build passed. CI will recheck the committed revision; no additional macOS/Linux verification is claimed for 0.4 here.
+
+---
+
 # Verification record — 2026-10-03 / OpenScratch 0.3
 
 Host: Windows x64. Python 3.14.7 through `py -3`, .NET SDK 8.0.204, Node 24.19.0 and Electron 44.5.1.

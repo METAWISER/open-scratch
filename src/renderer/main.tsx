@@ -24,7 +24,28 @@ declare global {
   }
 }
 type Modal =
-  "learn" | "preferences" | "packages" | "snippets" | "commands" | "tab" | null;
+  | "new-tab"
+  | "learn"
+  | "preferences"
+  | "packages"
+  | "snippets"
+  | "commands"
+  | "tab"
+  | null;
+function RailButton({
+  icon,
+  children,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { icon: string }) {
+  const label =
+    props["aria-label"] ?? (typeof children === "string" ? children : "");
+  return (
+    <button {...props} title={label} aria-label={label}>
+      <span aria-hidden="true">{icon}</span>
+      <span className="sr-only">{children}</span>
+    </button>
+  );
+}
 function App() {
   const [state, setState] = useState<AppState>(initialState),
     [loaded, setLoaded] = useState(false),
@@ -180,9 +201,22 @@ function App() {
       fail(e);
     }
   }, []);
-  const add = () => {
+  const add = () => setModal("new-tab");
+  const createTab = (language: Tab["language"]) => {
     stop();
-    const t = newTab(crypto.randomUUID());
+    const t = {
+      ...newTab(crypto.randomUUID()),
+      language,
+      code: "",
+      runtime: (language === "py"
+        ? "python"
+        : language === "cs"
+          ? "dotnet"
+          : ["jsx", "tsx"].includes(language)
+            ? "browser"
+            : "node") as Tab["runtime"],
+    };
+    setModal(null);
     setState((s) => ({ ...s, tabs: [...s.tabs, t], active: t.id }));
   };
   const saveSnippet = () =>
@@ -315,45 +349,55 @@ function App() {
   };
   return (
     <LocaleContext.Provider value={state.settings.locale}>
-      <main>
-        <header>
-          <div className="brand">
-            <span className="brand-icon">⌘</span>
-            <strong>OpenScratch</strong>
-            <span className="badge">LOCAL</span>
+      <main className="desktop-shell">
+        <aside className="activity-bar" aria-label={tr("Workspace tools")}>
+          <div className="rail-brand" title="OpenScratch">
+            ⌘
+          </div>
+          <div className="toolbar">
+            <RailButton
+              icon="▶"
+              className="primary"
+              disabled={!loaded}
+              onClick={() => void run()}
+            >
+              {tr("▶ Run")}
+            </RailButton>
+            <RailButton icon="□" onClick={stop}>
+              {tr("■ Stop")}
+            </RailButton>
+            <RailButton
+              icon="⌫"
+              onClick={() => {
+                pending.current = [];
+                setOutputs((s) => ({ ...s, [tab.id]: [] }));
+              }}
+            >
+              {tr("Clear")}
+            </RailButton>
           </div>
           <nav>
-            <button
-              onClick={() =>
-                void window.openscratch.openReference("docs").catch(fail)
-              }
-            >
-              {tr("Documentation")}
-            </button>
-            <button
+            <RailButton
+              icon="?"
               onClick={() => {
                 setHelpQuery("");
                 setModal("learn");
               }}
             >
               {tr("Learn")}
-            </button>
-            <button
-              onClick={() =>
-                void window.openscratch.openReference("contribute").catch(fail)
-              }
-            >
-              {tr("Contribute")}
-            </button>
-            <button
+            </RailButton>
+
+            <RailButton
+              icon="▱"
               onClick={() => {
                 setQuery("");
                 setModal("snippets");
               }}
             >
               {tr("Snippets")}
-            </button>
-            <button
+            </RailButton>
+            <RailButton
+              icon="⬡"
               onClick={() => {
                 setModal("packages");
                 void window.openscratch
@@ -363,24 +407,17 @@ function App() {
               }}
             >
               {tr("npm packages")}
-            </button>
-            <button
-              title="Ctrl/Cmd Shift P"
-              onClick={() => {
-                setQuery("");
-                setModal("commands");
-              }}
-            >
-              {tr("⌕ Commands")}
-            </button>
-            <button
+            </RailButton>
+
+            <RailButton
+              icon="⚙"
               aria-label={tr("Preferences")}
               onClick={() => setModal("preferences")}
             >
               ⚙
-            </button>
+            </RailButton>
           </nav>
-        </header>
+        </aside>
         <div className="tabs">
           {state.tabs.map((t) => (
             <div
@@ -421,63 +458,6 @@ function App() {
             ＋
           </button>
         </div>
-        <div className="toolbar">
-          <button
-            className="primary"
-            disabled={!loaded}
-            onClick={() => void run()}
-          >
-            {tr("▶ Run")}
-          </button>
-          <button onClick={stop}>{tr("■ Stop")}</button>
-          <label>
-            <input
-              type="checkbox"
-              checked={state.settings.autoRun}
-              onChange={(e) =>
-                setState((s) => ({
-                  ...s,
-                  settings: { ...s.settings, autoRun: e.target.checked },
-                }))
-              }
-            />
-            {tr("Auto Run")}
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              disabled={tab.language === "cs"}
-              title={
-                tab.language === "cs"
-                  ? tr("Use Console.WriteLine in C#")
-                  : tr("Log top-level expressions")
-              }
-              checked={state.settings.autoLog && tab.language !== "cs"}
-              onChange={(e) =>
-                setState((s) => ({
-                  ...s,
-                  settings: { ...s.settings, autoLog: e.target.checked },
-                }))
-              }
-            />
-            {tr("Auto Log")}
-          </label>
-          <span className="spacer" />
-          <button onClick={openHelp}>{tr("Look up")}</button>
-          <button
-            disabled={["py", "cs"].includes(tab.language)}
-            title={
-              ["py", "cs"].includes(tab.language)
-                ? tr("Formatting is available for JavaScript and TypeScript")
-                : tr("Format code")
-            }
-            onClick={() => void format()}
-          >
-            {tr("Format")}
-          </button>
-          <button onClick={saveSnippet}>{tr("Save snippet")}</button>
-          <button onClick={() => setModal("tab")}>{tr("Tab settings")}</button>
-        </div>
         {error && (
           <div className="error-banner" role="alert">
             <span>{error}</span>
@@ -501,6 +481,8 @@ function App() {
               tab={tab}
               settings={state.settings}
               onChange={codeChanged}
+              onFormat={() => void format()}
+              onSaveSnippet={saveSnippet}
               onReady={(e) => (editor.current = e)}
               onDiagnostics={setDiagnostics}
               onLogpoint={(line, clear) =>
@@ -533,7 +515,15 @@ function App() {
                 setSplit(
                   Math.max(
                     25,
-                    Math.min(75, (e.clientX / window.innerWidth) * 100),
+                    Math.min(
+                      75,
+                      ((e.clientX -
+                        e.currentTarget.parentElement!.getBoundingClientRect()
+                          .left) /
+                        e.currentTarget.parentElement!.getBoundingClientRect()
+                          .width) *
+                        100,
+                    ),
                   ),
                 );
             }}
@@ -544,14 +534,6 @@ function App() {
                 {tr("OUTPUT")}
                 <span className={`status-dot ${status}`} />
               </span>
-              <button
-                onClick={() => {
-                  pending.current = [];
-                  setOutputs((s) => ({ ...s, [tab.id]: [] }));
-                }}
-              >
-                {tr("Clear")}
-              </button>
             </div>
             <div className="console" data-testid="output">
               {!outputs[tab.id]?.length && (
@@ -692,6 +674,7 @@ function App() {
                 <h2 id="dialog-title">
                   {
                     {
+                      "new-tab": tr("Choose a language"),
                       learn: tr("Learn and reference"),
                       preferences: tr("Preferences"),
                       packages: tr("npm packages"),
@@ -703,6 +686,29 @@ function App() {
                 </h2>
                 <button onClick={() => setModal(null)}>✕</button>
               </div>
+              {modal === "new-tab" && (
+                <div className="language-grid">
+                  {(
+                    [
+                      ["js", "JavaScript", "Node.js"],
+                      ["ts", "TypeScript", "Node.js"],
+                      ["jsx", "JSX", "Browser"],
+                      ["tsx", "TSX", "Browser"],
+                      ["py", "Python", "Python"],
+                      ["cs", "C#", ".NET"],
+                    ] as const
+                  ).map(([language, label, runtime]) => (
+                    <button
+                      key={language}
+                      onClick={() => createTab(language)}
+                      autoFocus={language === "js"}
+                    >
+                      <strong>{label}</strong>
+                      <small>{runtime}</small>
+                    </button>
+                  ))}
+                </div>
+              )}
               {modal === "learn" && (
                 <LearningPanel
                   language={tab.language}
@@ -888,6 +894,85 @@ function App() {
               )}
               {modal === "preferences" && (
                 <>
+                  <div className="settings-links">
+                    {" "}
+                    <button
+                      onClick={() =>
+                        void window.openscratch
+                          .openReference("docs")
+                          .catch(fail)
+                      }
+                    >
+                      {tr("Documentation")}
+                    </button>
+                    <button
+                      onClick={() =>
+                        void window.openscratch
+                          .openReference("contribute")
+                          .catch(fail)
+                      }
+                    >
+                      {tr("Contribute")}
+                    </button>
+                    <button
+                      title="Ctrl/Cmd Shift P"
+                      onClick={() => {
+                        setQuery("");
+                        setModal("commands");
+                      }}
+                    >
+                      {tr("⌕ Commands")}
+                    </button>
+                    <button onClick={() => setModal("tab")}>
+                      {tr("Tab settings")}
+                    </button>
+                    <button onClick={openHelp}>{tr("Look up")}</button>
+                  </div>
+                  <div className="actions execution-toggles">
+                    {" "}
+                    <label>
+                      <input
+                        type="checkbox"
+                        aria-label={tr("Auto Run")}
+                        checked={state.settings.autoRun}
+                        onChange={(e) =>
+                          setState((s) => ({
+                            ...s,
+                            settings: {
+                              ...s.settings,
+                              autoRun: e.target.checked,
+                            },
+                          }))
+                        }
+                      />
+                      {tr("Auto Run")}
+                    </label>
+                    <label>
+                      <input
+                        type="checkbox"
+                        aria-label={tr("Auto Log")}
+                        disabled={tab.language === "cs"}
+                        title={
+                          tab.language === "cs"
+                            ? tr("Use Console.WriteLine in C#")
+                            : tr("Log top-level expressions")
+                        }
+                        checked={
+                          state.settings.autoLog && tab.language !== "cs"
+                        }
+                        onChange={(e) =>
+                          setState((s) => ({
+                            ...s,
+                            settings: {
+                              ...s.settings,
+                              autoLog: e.target.checked,
+                            },
+                          }))
+                        }
+                      />
+                      {tr("Auto Log")}
+                    </label>
+                  </div>
                   <div className="settings-grid">
                     <label>
                       {tr("Interface language")}
@@ -1116,6 +1201,42 @@ function App() {
                       <span>{p.version}</span>
                     </button>
                   ))}
+                  <h3>{tr("Popular packages")}</h3>
+                  <p className="muted">
+                    {tr(
+                      "A curated selection, not a live ranking. Install uses the latest version from npm. These packages are for JavaScript and TypeScript.",
+                    )}
+                  </p>
+                  <div className="popular-packages">
+                    {[
+                      ["lodash", "Utilities"],
+                      ["date-fns", "Dates"],
+                      ["axios", "HTTP requests"],
+                      ["zod", "Validation"],
+                      ["react", "User interfaces"],
+                      ["react-dom", "React rendering"],
+                    ].map(([name, description]) => {
+                      const installed = packages.some((p) => p.name === name);
+                      return (
+                        <div className="package-card" key={name}>
+                          <div>
+                            <strong>{name}</strong>
+                            <small>{tr(description)}</small>
+                          </div>
+                          <button
+                            disabled={busy || installed}
+                            aria-label={`${tr(installed ? "Installed" : "Install")} ${name}`}
+                            onClick={() =>
+                              void changePackage("install", name, "latest")
+                            }
+                          >
+                            {installed ? "✓" : "↓"}{" "}
+                            {tr(installed ? "Installed" : "Install")}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
                   <h3>{tr("Installed")}</h3>
                   {packages.length === 0 && (
                     <p className="muted">

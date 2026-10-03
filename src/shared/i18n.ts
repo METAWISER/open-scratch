@@ -1,5 +1,20 @@
 export type Locale = "en" | "es";
 export const spanish: Record<string, string> = {
+  "Workspace tools": "Herramientas",
+  "Choose a language": "Elige un lenguaje",
+  "Popular packages": "Paquetes populares",
+  Install: "Instalar",
+  Utilities: "Utilidades",
+  Dates: "Fechas",
+  "HTTP requests": "Peticiones HTTP",
+  Validation: "Validación",
+  "User interfaces": "Interfaces de usuario",
+  "React rendering": "Renderizado de React",
+  "A curated selection, not a live ranking. Install uses the latest version from npm. These packages are for JavaScript and TypeScript.":
+    "Una selección editorial, no una clasificación en tiempo real. Se instala la última versión de npm. Estos paquetes son para JavaScript y TypeScript.",
+  "Editor actions": "Acciones del editor",
+  Find: "Buscar",
+
   "Logpoint · F9 to remove": "Logpoint · F9 para eliminar",
   Learn: "Aprender",
   Contribute: "Colaborar",

@@ -69,3 +69,10 @@ The documented RunJS environment combines DOM and Node globals. A compatible imp
 | C# editor and inspection | Basic | Syntax highlighting and text output; no language server, Auto Log, CLR object inspector, NuGet UI or memory cap |
 | Clickable learning examples | Implemented | Title/code/button creates a separate tab with Auto Run off; Copy remains independent |
 | Documentation website | Implemented | Responsive English guides, search, copy, theme, navigation, static hosting workflow |
+
+## Desktop workflow update (0.4)
+
+- Compact left sidebar with labeled controls; editor height is reserved for code and results.
+- New-tab language picker supports all six editor languages; status-bar selection remains available.
+- Localized custom context menu provides formatting and snippet snapshots, plus Find and Select all.
+- Curated popular npm packages support direct installation through the existing package manager. This is not a live popularity ranking.

@@ -1,5 +1,5 @@
 import { translate } from "../shared/i18n";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as monaco from "monaco-editor";
 import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker";
 import TSWorker from "monaco-editor/esm/vs/language/typescript/ts.worker?worker";
@@ -32,6 +32,8 @@ export function Editor({
   tab,
   settings,
   onChange,
+  onFormat,
+  onSaveSnippet,
   onLogpoint,
   onReady,
   onDiagnostics,
@@ -39,10 +41,42 @@ export function Editor({
   tab: Tab;
   settings: Settings;
   onChange: (code: string) => void;
+  onFormat: () => void;
+  onSaveSnippet: () => void;
   onLogpoint: (line: number, clear?: boolean) => void;
   onReady: (editor: monaco.editor.IStandaloneCodeEditor) => void;
   onDiagnostics: (count: number) => void;
 }) {
+  const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const tr = (text: string) => translate(settings.locale, text);
+  useEffect(() => {
+    if (!menu) return;
+    menuRef.current
+      ?.querySelector<HTMLButtonElement>("button:not(:disabled)")
+      ?.focus();
+    const close = (event: PointerEvent) => {
+      if (!menuRef.current?.contains(event.target as Node)) setMenu(null);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenu(null);
+        editor.current?.focus();
+      }
+    };
+    const dismiss = () => setMenu(null);
+    window.addEventListener("pointerdown", close);
+    window.addEventListener("keydown", escape);
+    window.addEventListener("blur", dismiss);
+    window.addEventListener("resize", dismiss);
+    return () => {
+      window.removeEventListener("pointerdown", close);
+      window.removeEventListener("keydown", escape);
+      window.removeEventListener("blur", dismiss);
+      window.removeEventListener("resize", dismiss);
+    };
+  }, [menu]);
+  useEffect(() => setMenu(null), [tab.id]);
   const host = useRef<HTMLDivElement>(null),
     editor = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const callbacks = useRef({ onChange, onLogpoint, onReady, onDiagnostics });
@@ -50,6 +84,7 @@ export function Editor({
   useEffect(() => {
     const instance = monaco.editor.create(host.current!, {
       automaticLayout: true,
+      contextmenu: false,
       editContext: false,
       minimap: { enabled: false },
       padding: { top: 20, bottom: 20 },
@@ -172,5 +207,104 @@ export function Editor({
     );
     return () => decorations?.clear();
   }, [tab.logpoints, tab.id, settings.locale]);
-  return <div className="editor" ref={host} data-testid="editor" />;
+  const act = (action: () => void) => {
+    setMenu(null);
+    editor.current?.focus();
+    action();
+  };
+  return (
+    <>
+      <div
+        className="editor"
+        ref={host}
+        data-testid="editor"
+        onContextMenu={(event) => {
+          event.preventDefault();
+          setMenu({
+            x: Math.min(event.clientX, window.innerWidth - 245),
+            y: Math.min(event.clientY, window.innerHeight - 180),
+          });
+        }}
+        onKeyDown={(event) => {
+          if (
+            (event.shiftKey && event.key === "F10") ||
+            event.key === "ContextMenu"
+          ) {
+            event.preventDefault();
+            const rect = host.current!.getBoundingClientRect();
+            setMenu({ x: rect.left + 32, y: rect.top + 32 });
+          }
+        }}
+      />
+      {menu && (
+        <div
+          className="editor-context-menu"
+          ref={menuRef}
+          role="menu"
+          aria-label={tr("Editor actions")}
+          style={{ left: menu.x, top: menu.y }}
+          onKeyDown={(event) => {
+            if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key))
+              return;
+            event.preventDefault();
+            const items = Array.from(
+              event.currentTarget.querySelectorAll<HTMLButtonElement>(
+                "button:not(:disabled)",
+              ),
+            );
+            const index = items.indexOf(
+              document.activeElement as HTMLButtonElement,
+            );
+            items[
+              event.key === "Home"
+                ? 0
+                : event.key === "End"
+                  ? items.length - 1
+                  : (index +
+                      (event.key === "ArrowDown" ? 1 : -1) +
+                      items.length) %
+                    items.length
+            ]?.focus();
+          }}
+        >
+          <button
+            role="menuitem"
+            disabled={["py", "cs"].includes(tab.language)}
+            onClick={() => act(onFormat)}
+          >
+            {tr("Format")}
+            <kbd>Ctrl ⇧ F</kbd>
+          </button>
+          <button role="menuitem" onClick={() => act(onSaveSnippet)}>
+            {tr("Save snippet")}
+            <kbd>Ctrl S</kbd>
+          </button>
+          <button
+            role="menuitem"
+            onClick={() =>
+              act(() => {
+                void editor.current?.getAction("actions.find")?.run();
+              })
+            }
+          >
+            {tr("Find")}
+            <kbd>Ctrl F</kbd>
+          </button>
+          <button
+            role="menuitem"
+            onClick={() =>
+              act(() => {
+                const model = editor.current?.getModel();
+                if (model)
+                  editor.current?.setSelection(model.getFullModelRange());
+              })
+            }
+          >
+            {tr("Select all")}
+            <kbd>Ctrl A</kbd>
+          </button>
+        </div>
+      )}
+    </>
+  );
 }

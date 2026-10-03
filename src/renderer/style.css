@@ -565,3 +565,166 @@ h3 {
 .lesson-code pre {
   margin: 0;
 }
+
+/* Compact desktop rail keeps controls reachable without taking editor height. */
+.desktop-shell {
+  padding-left: 116px;
+  position: relative;
+}
+.activity-bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 116px;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+  padding: 8px;
+  gap: 8px;
+}
+.rail-brand {
+  color: var(--accent);
+  font-size: 28px;
+  text-align: center;
+  padding: 2px;
+}
+.activity-bar .toolbar {
+  height: auto;
+  padding: 0 0 10px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+}
+.activity-bar .toolbar .spacer {
+  display: none;
+}
+.activity-bar .toolbar label {
+  min-height: 30px;
+  margin: 0;
+  padding: 5px;
+  font-size: 11px;
+}
+.activity-bar nav {
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+.activity-bar button {
+  white-space: normal;
+  min-height: 30px;
+  text-align: left;
+  padding: 7px;
+  font-size: 11px;
+}
+.activity-bar nav button:last-child {
+  margin-top: auto;
+  font-size: 20px;
+  text-align: center;
+}
+.language-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 12px 0;
+}
+.language-grid button {
+  border: 1px solid var(--line);
+  padding: 24px;
+  text-align: left;
+}
+.language-grid strong {
+  display: block;
+  font-size: 18px;
+  color: var(--accent);
+}
+.language-grid small,
+.package-card small {
+  display: block;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.popular-packages {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.package-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+}
+.package-card button {
+  color: var(--accent);
+}
+.editor-context-menu {
+  position: fixed;
+  z-index: 100;
+  width: 235px;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 8px 32px #0006;
+}
+.editor-context-menu button {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  text-align: left;
+}
+.editor-context-menu kbd {
+  color: var(--muted);
+  font: inherit;
+  margin-left: 12px;
+}
+
+.desktop-shell {
+  padding-left: 60px;
+}
+.activity-bar {
+  width: 60px;
+  padding: 6px;
+}
+.activity-bar button {
+  text-align: center;
+  font-size: 19px;
+  min-height: 34px;
+}
+.activity-bar .toolbar label {
+  padding: 5px 0;
+  font-size: 10px;
+}
+.activity-bar abbr {
+  text-decoration: none;
+}
+.activity-bar input[type="checkbox"] {
+  margin-right: 4px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.settings-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 16px;
+}
+.execution-toggles {
+  margin-bottom: 20px;
+}
